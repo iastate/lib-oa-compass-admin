@@ -1,0 +1,87 @@
+<!-- src/app/components/user-search/user-search.component.html -->
+<section class="eca-section oa-user-search-root">
+
+  <!-- Search input -->
+  <mat-form-field class="oa-search-field" appearance="fill">
+    <mat-label>{{ 'oa.search.placeholder' | translate }}</mat-label>
+    <input
+      matInput
+      type="text"
+      id="userSearchTerm"
+      name="userSearchTerm"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onModelChange($event)"
+      (keydown.enter)="onSearchClick()"
+      [disabled]="searching"
+    />
+    <button
+      matSuffix
+      mat-icon-button
+      [attr.aria-label]="'oa.search.searchButton' | translate"
+      (click)="onSearchClick()"
+      [disabled]="searching || !searchTerm.trim()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <!-- Error line under the field -->
+  <div class="error" *ngIf="searchError">
+    {{ searchError }}
+  </div>
+
+  <!-- Results list -->
+  <section class="results-section" *ngIf="showResults">
+    <mat-card *ngIf="results?.length; else emptyList" class="results-card">
+      <mat-card-header class="results-header">
+        <mat-card-title class="results-title">
+          {{ 'oa.search.resultsWithCount' | translate:{ count: results.length } }}
+        </mat-card-title>
+
+        <button
+          mat-flat-button
+          type="button"
+          (click)="onLoadMoreClick()"
+          [disabled]="searching || !moreAvailable">
+          {{ 'oa.search.loadMore' | translate }}
+        </button>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-selection-list
+          [multiple]="false"
+          [hideSingleSelectionIndicator]="true"
+          class="results-list">
+          <mat-list-option
+            *ngFor="let r of results; trackBy: trackUser"
+            (click)="onRowClick(r)">
+            <div class="result-row">
+              <div class="result-main">
+                <div class="result-name">
+                  {{ r.first_name }} {{ r.last_name }}
+                </div>
+                <div class="result-meta">
+                  {{ 'oa.search.idLabel' | translate }} {{ r.primary_id }}
+                </div>
+              </div>
+
+              <!-- Icon-only “chevron” select button -->
+              <button
+                mat-icon-button
+                type="button"
+                class="result-chevron"
+                [attr.aria-label]="'oa.search.selectUser' | translate">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          </mat-list-option>
+        </mat-selection-list>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-template #emptyList>
+      <div class="empty-results">
+        {{ 'oa.search.emptyResults' | translate }}
+      </div>
+    </ng-template>
+  </section>
+</section>

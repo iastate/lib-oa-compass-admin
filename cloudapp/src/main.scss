@@ -1,0 +1,349 @@
+// src/main.scss
+@import './app/main/main.component.theme';
+
+/**
+ * 1. Theme hook for the Cloud App SDK
+ * -----------------------------------
+ * This is called with the Alma theme object. Keep it thin and delegate to
+ * the main component theming so we don't accidentally invent new APIs.
+ */
+@mixin themed-styles($theme, $typography) {
+  @include main-component-theme($theme, $typography);
+}
+
+/**
+ * 2. Global CSS inside the Cloud App iframe
+ * -----------------------------------------
+ * Everything here is plain CSS — no theme object. It is applied only inside
+ * the app iframe, so it will not leak into Alma itself.
+ */
+@mixin global-styles {
+
+  /***************************************************************
+   * 2.1 Shared design tokens (colors, borders, card background)
+   ***************************************************************/
+  :root {
+    /* Brand buttons */
+    --oa-primary: #7d46c6;       /* purple, matches app icon */
+    --oa-primary-on: #ffffff;
+
+    --oa-secondary: #f2f2f2;     /* light grey */
+    --oa-secondary-on: #333333;
+
+    /* Header background for OA Status bar */
+    --oa-accent: #f2f2f2;
+    --oa-accent-on: #000000;
+
+    /* Surfaces & borders */
+    --oa-card: #ffffff;
+    --oa-border: #dcdcdc;
+
+    /* Status colors (already used in Settings/Config) */
+    --oa-success: #2e7d32;
+    --oa-danger: #c62828;
+  }
+
+  /***************************************************************
+   * 2.2 Typography (Roboto + weights like the style guide)
+   ***************************************************************/
+  body,
+  .mat-typography {
+    font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300; /* running text */
+    color: #333333;
+  }
+
+  h1,
+  .mat-typography h1 {
+    font-size: 16px;
+    font-weight: 500; /* main titles */
+  }
+
+  h2,
+  .mat-typography h2 {
+    font-size: 14px;
+    font-weight: 400; /* secondary titles */
+  }
+
+  p,
+  .mat-typography p,
+  .mat-body-1 {
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  /***************************************************************
+   * 2.3 OA header bar (status line)
+   *     Uses the grey header background from the spec.
+   ***************************************************************/
+  .app-header {
+    background-color: var(--oa-accent);
+    color: var(--oa-accent-on);
+  }
+
+  /***************************************************************
+  * 2.4 Form fields: fix MDC floating-label clipping + baseline
+  ***************************************************************/
+
+  /* Underline styling (keep) */
+  .mat-mdc-form-field .mdc-line-ripple::before {
+    border-bottom-color: var(--oa-border);
+  }
+  .mat-mdc-form-field .mdc-line-ripple::after {
+    border-bottom-color: var(--sys-primary, var(--oa-primary));
+  }
+
+  /* ✅ Do NOT clip */
+  .mat-mdc-form-field .mat-mdc-text-field-wrapper,
+  .mat-mdc-form-field .mdc-text-field,
+  .mat-mdc-form-field .mat-mdc-form-field-infix {
+    overflow: visible !important;
+  }
+
+  /* ✅ Keep control height consistent */
+  .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+    min-height: 56px;
+  }
+
+  /*
+    ✅ IMPORTANT: stop using infix padding to position the text.
+    It makes the value/label float way too high.
+  */
+  .mat-mdc-form-field.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-infix {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
+  }
+
+  /* ✅ Position the text by padding the actual input */
+  .mat-mdc-form-field.mat-mdc-form-field-appearance-fill
+  .mdc-text-field--filled
+  .mdc-text-field__input {
+    padding-top: 24px !important;   /* was 18px */
+    padding-bottom: 10px !important; /* was 12px */
+  }
+
+  /* ✅ Help the resting label not get “sliced” */
+  .mat-mdc-form-field .mdc-floating-label,
+  .mat-mdc-form-field .mat-mdc-floating-label {
+    line-height: 1.2;
+    padding-top: 2px;
+  }
+
+  /* Slightly heavier input text when focused (keep) */
+  .mat-mdc-form-field.mdc-text-field--focused .mat-mdc-input-element {
+    font-weight: 500;
+  }
+
+  /* ✅ Floating label should be primary (resting + floating) */
+  .mat-mdc-form-field .mdc-floating-label,
+  .mat-mdc-form-field .mat-mdc-floating-label {
+    color: var(--sys-primary, var(--oa-primary)) !important;
+    opacity: 1 !important;
+  }
+
+  /* ✅ Ensure “float above” state stays primary */
+  .mat-mdc-form-field .mdc-floating-label--float-above,
+  .mat-mdc-form-field.mat-focused .mdc-floating-label {
+    color: var(--sys-primary, var(--oa-primary)) !important;
+    opacity: 1 !important;
+  }
+
+  .mat-mdc-form-field .mdc-line-ripple::before {
+    border-bottom-color: var(--sys-primary, var(--oa-primary)) !important; /* was oa-border */
+  }
+  .mat-mdc-form-field .mdc-line-ripple::after {
+    border-bottom-color: var(--sys-primary, var(--oa-primary)) !important;
+  }
+
+  /* ============================================================
+  * Compact form-field sizing (Config + Settings only)
+  * ============================================================ */
+
+  /* Wrapper height */
+  .oa-config-root .mat-mdc-form-field .mat-mdc-text-field-wrapper,
+  .oa-settings-root .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+    min-height: 44px !important;
+    padding-top: 16px !important;
+  }
+
+  /* Infix spacing (controls where label/value sit) */
+  .oa-config-root
+    .mat-mdc-form-field.mat-mdc-form-field-appearance-fill
+    .mat-mdc-form-field-infix,
+  .oa-settings-root
+    .mat-mdc-form-field.mat-mdc-form-field-appearance-fill
+    .mat-mdc-form-field-infix {
+    padding-top: 12px !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* Input padding (controls baseline relative to underline) */
+  .oa-config-root
+    .mat-mdc-form-field.mat-mdc-form-field-appearance-fill
+    .mdc-text-field__input,
+  .oa-settings-root
+    .mat-mdc-form-field.mat-mdc-form-field-appearance-fill
+    .mdc-text-field__input {
+    padding-top: 18px !important;
+    padding-bottom: 8px !important;
+  }
+
+  /***************************************************************
+   * 2.5 Select panels & config/select helpers
+   ***************************************************************/
+  /* Opaque dropdown panels everywhere in the app */
+  .mat-mdc-select-panel {
+    background-color: var(--eca-surface, #ffffff) !important;
+    border: 1px solid var(--oa-border);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  }
+
+  /* Config + Settings already use card styling via component SCSS.
+     Keep the wrapper backgrounds consistent with card tokens. */
+  .oa-config-root .mat-mdc-text-field-wrapper,
+  .oa-config-root .mat-mdc-select-trigger,
+  .oa-config-select-panel,
+  .oa-settings-root .settings-select__box {
+    background-color: var(--oa-card);
+  }
+
+  /***************************************************************
+  * 2.6 Main search-field fixes (prevents floating-label clipping)
+  ***************************************************************/
+  .oa-user-search-root .oa-search-field.mat-mdc-form-field {
+    height: auto;
+    min-height: 56px;
+  }
+
+  .oa-user-search-root .oa-search-field .mat-mdc-text-field-wrapper {
+    overflow: visible !important;
+    min-height: 56px;
+  }
+
+  .oa-user-search-root .oa-search-field .mat-mdc-form-field-flex {
+    min-height: 56px;
+    align-items: center;
+  }
+
+  /* ✅ Do NOT set infix padding here either */
+  .oa-user-search-root .oa-search-field .mat-mdc-form-field-infix {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* ✅ Let the input padding control baseline */
+  .oa-user-search-root .oa-search-field
+  .mdc-text-field--filled
+  .mdc-text-field__input {
+    padding-top: 18px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .oa-user-search-root .oa-search-field .mdc-floating-label,
+  .oa-user-search-root .oa-search-field .mat-mdc-floating-label {
+    line-height: 1.2;
+    padding-top: 2px;
+  }
+
+  /* Give the search area breathing room so the floating label doesn't rise into OA Status */
+  .oa-user-search-root {
+    padding-top: 14px;
+  }
+
+  /* Extra safety: add a little margin above the field itself */
+  .oa-user-search-root .oa-search-field.mat-mdc-form-field {
+    margin-top: 6px;
+  }
+
+  /***************************************************************
+   * 2.7 Buttons: flat, square corners, purple / grey palette
+   *     Applies to:
+   *       - main action bar (.eca-actions)
+   *       - footer action rows in Settings/Config (.oa-footer-actions)
+   ***************************************************************/
+   /* MAIN ACTION BAR BUTTONS (Reset / Resend / Sync / Create) */
+   .eca-actions button.mat-mdc-button-base {
+     border-radius: 0;
+     text-transform: none;
+     font-weight: 500;
+     min-width: 90px;
+     max-width: 104px;
+     flex: 0 1 104px;
+     box-shadow: none;
+   }
+
+   /* FOOTER BUTTONS (Settings / Config) – same look, but size to content */
+   .oa-footer-actions button.mat-mdc-button-base {
+      border-radius: 0;
+      text-transform: none;
+      font-weight: 500;
+      min-width: 96px;
+      box-shadow: none;
+   }
+  /* Primary (Create / Save) – filled purple */
+  .eca-actions button.mat-mdc-button-base[color='primary'],
+  .oa-footer-actions button.mat-mdc-button-base[color='primary'] {
+    background-color: var(--oa-primary);
+    color: var(--oa-primary-on);
+  }
+
+  .eca-actions button.mat-mdc-button-base[color='primary'] .mat-mdc-button-persistent-ripple::before,
+  .oa-footer-actions button.mat-mdc-button-base[color='primary'] .mat-mdc-button-persistent-ripple::before {
+    background-color: rgba(0, 0, 0, 0.12);
+  }
+
+  /* Secondary (Reset / Resend / Sync / Cancel) – grey */
+  .eca-actions button.mat-mdc-button-base[color='secondary'],
+  .oa-footer-actions button.mat-mdc-button-base[color='secondary'] {
+    background-color: var(--oa-secondary);
+    color: var(--oa-secondary-on);
+    border: 1px solid var(--oa-border);
+  }
+
+  .eca-actions button.mat-mdc-button-base[color='secondary']:hover,
+  .oa-footer-actions button.mat-mdc-button-base[color='secondary']:hover {
+    background-color: #e6e6e6;
+  }
+
+  /* Disabled state: wash everything out a bit */
+  .eca-actions button.mat-mdc-button-base[disabled],
+  .oa-footer-actions button.mat-mdc-button-base[disabled] {
+    opacity: 0.5;
+  }
+
+  /***************************************************************
+   * 2.8 Checkbox, radio, and toggle colors
+   *     Use primary theme color per style guide.
+   ***************************************************************/
+  .mat-mdc-checkbox.mat-primary .mdc-checkbox__background,
+  .mat-mdc-checkbox.mat-accent .mdc-checkbox__background {
+    border-color: var(--sys-primary, var(--oa-primary));
+    background-color: var(--sys-primary, var(--oa-primary));
+  }
+
+  .mat-mdc-radio-button.mat-primary .mdc-radio__background::before,
+  .mat-mdc-radio-button.mat-accent .mdc-radio__background::before,
+  .mat-mdc-radio-button.mat-primary .mdc-radio__background::after,
+  .mat-mdc-radio-button.mat-accent .mdc-radio__background::after {
+    border-color: var(--sys-primary, var(--oa-primary));
+  }
+
+  .mat-mdc-slide-toggle.mat-primary .mdc-switch__shadow,
+  .mat-mdc-slide-toggle.mat-accent .mdc-switch__shadow {
+    background-color: var(--sys-primary, var(--oa-primary));
+  }
+
+  /***************************************************************
+   * 2.9 Icons
+   *     Match the guide: 16px, #4164A4.
+   ***************************************************************/
+  .mat-icon,
+  .eca-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #5C2DA7;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "oa": {
+    "auth": {
+      "checking": "Verificando roles del operador de Alma...",
+      "deniedStatus": "Acceso denegado",
+      "lookupFailedStatus": "Falló la verificación de autorización",
+      "deniedTitle": "No autorizado",
+      "deniedMessage": "OA Compass Admin está limitado a operadores de Alma con los roles de gestión de usuarios requeridos.",
+      "requiredRoles": "Roles requeridos: {{roles}}",
+      "errorTitle": "Falló la verificación de autorización",
+      "errorMessage": "La aplicación no pudo verificar los roles del operador de Alma. El acceso permanece bloqueado hasta que la verificación tenga éxito."
+    }
+  }
+}

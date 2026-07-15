@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  ACTIONLINT_IMAGE: rhysd/actionlint@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9
+  GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and validate the public boundary
+        run: npm run check
+
+      - name: Validate GitHub Actions workflows
+        run: >-
+          docker run --rm
+          --volume "${GITHUB_WORKSPACE}:/repo"
+          --workdir /repo
+          "${ACTIONLINT_IMAGE}"
+
+      - name: Scan history for secrets
+        run: >-
+          docker run --rm
+          --volume "${GITHUB_WORKSPACE}:/repo"
+          "${GITLEAKS_IMAGE}"
+          git /repo --redact --no-banner

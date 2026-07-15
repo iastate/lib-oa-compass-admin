@@ -1,0 +1,640 @@
+openapi: 3.0.3
+info:
+  title: OA Proxy API
+  version: 1.0.0
+  description: >
+    Scanner-safe OpenAPI definition for the OA Compass Admin proxy. The proxy
+    exposes a health endpoint plus authenticated OpenAthens account operations
+    used by the Alma Cloud App.
+servers:
+  - url: https://proxy.example.edu/oa-proxy
+    description: Example institutional OA proxy
+
+tags:
+  - name: Health
+    description: Proxy availability checks.
+  - name: OA Users
+    description: Authenticated OpenAthens user operations.
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Check proxy health
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Proxy is running.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                ok: true
+                service: oa-proxy
+                time: "2026-06-09T15:30:00.000Z"
+
+  /v1/oa/users/verify:
+    post:
+      tags:
+        - OA Users
+      summary: Verify whether an OpenAthens account exists
+      operationId: verifyUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LookupRequest"
+            example:
+              username: iast-example
+      responses:
+        "200":
+          description: Verification result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/oa/users/get:
+    post:
+      tags:
+        - OA Users
+      summary: Get an OpenAthens account
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LookupRequest"
+            example:
+              email: user@example.edu
+      responses:
+        "200":
+          description: Account lookup result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/oa/users/create:
+    post:
+      tags:
+        - OA Users
+      summary: Create an OpenAthens account
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+            example:
+              primary_id: "123456789"
+              email: user@example.edu
+              first_name: Example
+              last_name: User
+              expires: "2027-06-09"
+              alma_group_code: "56"
+              status: pending
+      responses:
+        "200":
+          description: Account creation result. Existing accounts may be reported as a successful non-create result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateAccountResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/oa/users/modify:
+    post:
+      tags:
+        - OA Users
+      summary: Modify an OpenAthens account
+      operationId: modifyUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifyAccountRequest"
+            example:
+              openathens_id: "abc123"
+              primary_id: "123456789"
+              username: iast-example
+              email: user@example.edu
+              first_name: Example
+              last_name: User
+              expires: "2027-06-09"
+              status: active
+      responses:
+        "200":
+          description: Account modification result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModifyAccountResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/oa/users/resend-activation:
+    post:
+      tags:
+        - OA Users
+      summary: Resend OpenAthens activation email
+      operationId: resendActivation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountIdentifierRequest"
+            example:
+              username: iast-example
+      responses:
+        "200":
+          description: Activation email resend result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResendActivationResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Alma Cloud App bearer token validated by the proxy.
+
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required lookup identifier.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            missingIdentifier:
+              value:
+                error: username or email required
+            invalidInput:
+              value:
+                error: invalid input
+                invalid:
+                  email: invalid
+                  first_name: required
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthErrorResponse"
+          examples:
+            bearerRequired:
+              value:
+                error: Bearer token required
+                code: AUTH_BEARER_REQUIRED
+            invalidToken:
+              value:
+                error: Invalid bearer token
+                code: AUTH_TOKEN_INVALID
+    Forbidden:
+      description: Authenticated request is not authorized for the operation or privileged fields.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            requiredRole:
+              value:
+                error: Forbidden
+                code: AUTHZ_REQUIRED_ROLE
+                requiredRoles:
+                  - oa-admin
+            privilegedFields:
+              value:
+                error: forbidden
+                code: PRIVILEGED_FIELDS_FORBIDDEN
+    NotFound:
+      description: OpenAthens account was not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            lookupNotFound:
+              value:
+                error: not found
+                normalizedUsername: iast-example
+            oaNotFound:
+              value:
+                error: account not found
+                code: OA_NOT_FOUND
+    ServerError:
+      description: Proxy configuration, upstream OpenAthens, or unexpected server failure.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            missingConfig:
+              value:
+                error: OA_API_KEY not set
+            upstreamError:
+              value:
+                error: OA query failed
+                code: upstream_error_code
+                message: OpenAthens request failed
+                status: 502
+
+  schemas:
+    JsonObject:
+      type: object
+      additionalProperties: true
+
+    HealthResponse:
+      type: object
+      required:
+        - ok
+        - service
+        - time
+      properties:
+        ok:
+          type: boolean
+        service:
+          type: string
+          enum:
+            - oa-proxy
+        time:
+          type: string
+          format: date-time
+
+    LookupRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: OpenAthens username to query.
+        email:
+          type: string
+          format: email
+          description: Email address to query.
+      anyOf:
+        - required:
+            - username
+        - required:
+            - email
+
+    AccountIdentifierRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        openathens_id:
+          type: string
+          minLength: 1
+          description: OpenAthens account ID.
+        username:
+          type: string
+          minLength: 1
+          description: OpenAthens username.
+        email:
+          type: string
+          format: email
+          description: Email address associated with the account.
+      anyOf:
+        - required:
+            - openathens_id
+        - required:
+            - username
+        - required:
+            - email
+
+    CreateAccountRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - primary_id
+        - email
+        - first_name
+        - last_name
+        - expires
+      properties:
+        primary_id:
+          type: string
+          minLength: 1
+          description: Alma primary identifier. The proxy writes this to OpenAthens attributes.identifier, shown as Staff/student number.
+        email:
+          type: string
+          format: email
+          description: The proxy writes this to OpenAthens attributes.emailAddress and attributes.uniqueEmailAddress.
+        first_name:
+          type: string
+          minLength: 1
+          description: The proxy writes this to OpenAthens attributes.forenames.
+        last_name:
+          type: string
+          minLength: 1
+          description: The proxy writes this to OpenAthens attributes.surname.
+        expires:
+          type: string
+          description: Expiration date expected by the proxy as YYYY-MM-DD.
+          pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2027-06-09"
+        password:
+          type: string
+          description: Optional password. If omitted and status is active, the proxy submits pending to OpenAthens.
+        status:
+          type: string
+          enum:
+            - active
+            - pending
+          default: pending
+        alma_group_key:
+          type: string
+          description: Proxy policy key used to derive OpenAthens groups and permission sets.
+        alma_group_code:
+          type: string
+          description: Alma group code used to derive OpenAthens groups, permission sets, and attributes.userClass.
+        groups:
+          type: array
+          items:
+            type: string
+          description: Explicit OpenAthens group override. Requires privileged authorization in header auth mode.
+        permissionSets:
+          type: array
+          items:
+            type: string
+          description: Explicit OpenAthens permission set override. Requires privileged authorization in header auth mode.
+
+    ModifyAccountRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        openathens_id:
+          type: string
+          minLength: 1
+        username:
+          type: string
+          minLength: 1
+        primary_id:
+          type: string
+          minLength: 1
+          description: Alma primary identifier. When supplied, the proxy writes this to OpenAthens attributes.identifier, shown as Staff/student number.
+        email:
+          type: string
+          format: email
+          description: When supplied, the proxy writes this to OpenAthens attributes.emailAddress and attributes.uniqueEmailAddress.
+        first_name:
+          type: string
+          minLength: 1
+          description: When supplied, the proxy writes this to OpenAthens attributes.forenames.
+        last_name:
+          type: string
+          minLength: 1
+          description: When supplied, the proxy writes this to OpenAthens attributes.surname.
+        expires:
+          type: string
+          description: Expiration date expected by the proxy as YYYY-MM-DD.
+          pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2027-06-09"
+        status:
+          type: string
+          enum:
+            - active
+            - suspended
+            - pending
+        alma_group_key:
+          type: string
+          description: Proxy policy key used to derive OpenAthens groups and permission sets.
+        alma_group_code:
+          type: string
+          description: Alma group code used to derive OpenAthens groups, permission sets, and attributes.userClass. Unknown codes map to userClass member.
+        groups:
+          type: array
+          items:
+            type: string
+          description: Explicit OpenAthens group override. Requires privileged authorization in header auth mode.
+        permissionSets:
+          type: array
+          items:
+            type: string
+          description: Explicit OpenAthens permission set override. Requires privileged authorization in header auth mode.
+      anyOf:
+        - required:
+            - openathens_id
+        - required:
+            - username
+        - required:
+            - email
+
+    VerifyResponse:
+      type: object
+      required:
+        - found
+        - normalizedUsername
+        - raw
+      properties:
+        found:
+          type: boolean
+        normalizedUsername:
+          type: string
+          nullable: true
+        raw:
+          $ref: "#/components/schemas/JsonObject"
+
+    GetAccountResponse:
+      type: object
+      required:
+        - account
+        - normalizedUsername
+      properties:
+        account:
+          $ref: "#/components/schemas/JsonObject"
+        normalizedUsername:
+          type: string
+          nullable: true
+
+    CreateAccountSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        expiry:
+          type: string
+          nullable: true
+        activationCode:
+          type: string
+          nullable: true
+        activationExpires:
+          type: string
+          nullable: true
+        groups:
+          type: array
+          items:
+            type: string
+        permissionSets:
+          type: array
+          items:
+            type: string
+
+    CreateAccountResponse:
+      type: object
+      required:
+        - created
+        - raw
+      properties:
+        created:
+          type: boolean
+        alreadyExists:
+          type: boolean
+        raw:
+          $ref: "#/components/schemas/JsonObject"
+        summary:
+          $ref: "#/components/schemas/CreateAccountSummary"
+        appliedPolicy:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/JsonObject"
+        reason:
+          type: string
+
+    ModifyAccountResponse:
+      type: object
+      required:
+        - modified
+        - id
+        - raw
+        - appliedPolicy
+      properties:
+        modified:
+          type: boolean
+        id:
+          type: string
+        raw:
+          $ref: "#/components/schemas/JsonObject"
+        appliedPolicy:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/JsonObject"
+
+    ResendActivationResponse:
+      type: object
+      required:
+        - resent
+        - id
+        - raw
+      properties:
+        resent:
+          type: boolean
+        id:
+          type: string
+        raw:
+          $ref: "#/components/schemas/JsonObject"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+        status:
+          type: integer
+        normalizedUsername:
+          type: string
+          nullable: true
+        requiredRoles:
+          type: array
+          items:
+            type: string
+        invalid:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: true
+
+    AuthErrorResponse:
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+        - type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - AUTH_REQUIRED
+                - AUTH_BEARER_REQUIRED
+                - AUTH_TOKEN_INVALID
+                - AUTH_MODE_INVALID

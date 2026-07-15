@@ -1,0 +1,34 @@
+<!-- src/app/components/user-shell/user-shell.component.html -->
+<ng-container *ngIf="user">
+  <div class="oa-user-shell">
+
+    <!-- User info block -->
+    <div class="oa-user-info-block">
+      <user-info
+        [user]="user"
+        [selectedUserId]="selectedUserId"
+        [displayName]="displayName"
+        [email]="email"
+        [userGroup]="userGroup"
+        [expiry]="expiry"
+        [oaUsername]="oaUsername">
+      </user-info>
+    </div>
+
+    <!-- Debug panel beneath user info -->
+    <ng-container *ngIf="showDebugPanel && lastProxyResponse">
+      <mat-expansion-panel class="oa-debug-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ 'oa.debug.panelTitle' | translate }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <pre class="oa-debug-pre">
+          {{ lastProxyResponse }}
+        </pre>
+      </mat-expansion-panel>
+    </ng-container>
+
+  </div>
+</ng-container>

@@ -1,0 +1,18 @@
+<!-- src/app/components/app-header/app-header.component.html -->
+<header class="app-header">
+  <div class="app-header-main">
+
+    <!-- OA Status line -->
+    <div class="app-status-line">
+      <span class="app-status-label">
+        {{ 'oa.header.statusLabel' | translate }}
+      </span>
+      <span class="app-status-value">
+        {{ statusText || ('oa.header.statusUserNotLoaded' | translate) }}
+      </span>
+      <span *ngIf="busy" class="app-status-busy">
+        {{ 'oa.header.working' | translate }}
+      </span>
+    </div>
+  </div>
+</header>

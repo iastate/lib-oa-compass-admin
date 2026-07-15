@@ -1,0 +1,508 @@
+// src/app/services/oa-workflow.service.ts
+import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
+import { AlmaUser } from '../models/alma-user.model';
+import { AlmaUserService } from './alma-user.service';
+import { OAProxyService } from './oa-proxy.service';
+import {
+  OAAccountCreate,
+  OAAccountModify,
+  OAGetResponse,
+  OAResendRequest,
+  OAResendResponse
+} from '../models/oa-account.model';
+import {
+  OASecondaryField,
+  OAUsernameField
+} from '../models/oa-settings.model';
+
+export interface OAWorkflowResult {
+  statusText: string;
+  proxyDebugText?: string;
+  oaUsername?: string;
+  needsReload: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OAWorkflowService {
+
+  constructor(
+    private translate: TranslateService,
+    private alma: AlmaUserService,
+    private oa: OAProxyService
+  ) {}
+
+  private formatProxyError(err: any): string {
+    const status = Number.isFinite(err?.status) ? Number(err.status) : null;
+    const statusText = err?.statusText || 'Unknown Error';
+    const url = err?.url || 'unknown';
+    const errBody = err?.error;
+
+    if (errBody && typeof errBody === 'object' && !this.isProgressEventLike(errBody)) {
+      return JSON.stringify(errBody, null, 2);
+    }
+
+    if (status === 0 || this.isProgressEventLike(errBody)) {
+      return [
+        '[Network/transport error]',
+        'The browser did not receive a usable JSON response from the OA proxy.',
+        `status: ${status ?? 'n/a'}`,
+        `statusText: ${statusText}`,
+        `url: ${url}`,
+        'Likely causes: ALLOWED_ORIGINS mismatch, missing/invalid Cloud App bearer token, TLS/certificate problem, or proxy unreachable.',
+        'Check the browser Network tab and the oa-proxy/Apache logs for the matching request.'
+      ].join('\n');
+    }
+
+    return [
+      '[HTTP error]',
+      `status: ${status ?? 'n/a'}`,
+      `statusText: ${statusText}`,
+      `url: ${url}`,
+      `message: ${err?.message || String(err)}`
+    ].join('\n');
+  }
+
+  private isProgressEventLike(value: any): boolean {
+    return !!value && typeof value === 'object' && 'isTrusted' in value;
+  }
+
+  // -----------------------------
+  // RESEND WORKFLOW
+  // -----------------------------
+  async resendActivationWorkflow(
+    user: AlmaUser | null,
+    selectedUserId: string | null
+  ): Promise<OAWorkflowResult> {
+
+    if (!user && !selectedUserId) {
+      return { statusText: '', needsReload: false };
+    }
+
+    // Use email as the canonical handle for resend
+    const email = this.alma.getEmail(user) ?? '';
+
+    if (!email) {
+      return {
+        statusText: this.translate.instant('oa.status.resendMissingEmail'),
+        proxyDebugText: this.translate.instant('oa.status.almaFieldsMissingModify'),
+        needsReload: false
+      };
+    }
+
+    const payload: OAResendRequest = { email };
+
+    try {
+      const resp: OAResendResponse = await this.oa.resendActivation(payload);
+
+      return {
+        statusText: this.translate.instant('oa.status.resendSuccess'),
+        proxyDebugText: JSON.stringify(resp, null, 2),
+        needsReload: false
+      };
+
+    } catch (err: any) {
+      const handled = this.handleNotFoundLikeError(err);
+      if (handled) return handled;
+
+      return {
+        statusText: this.translate.instant('oa.status.resendFailed'),
+        proxyDebugText: this.formatProxyError(err),
+        needsReload: false
+      };
+    }
+  }
+
+  // -----------------------------
+  // CREATE WORKFLOW
+  // -----------------------------
+  async createAccountWorkflow(
+    user: AlmaUser | null,
+    selectedUserId: string | null,
+    oaIdTypeCode: string,
+    primaryField: OAUsernameField,
+    secondaryField: OASecondaryField
+  ): Promise<OAWorkflowResult> {
+
+    const pid = user?.primary_id || selectedUserId || '';
+
+    if (!user && !selectedUserId) {
+      return { statusText: '', needsReload: false };
+    }
+
+    // 0) Block create for configured disallowed domains (IDP users)
+    const email = this.alma.getEmail(user) ?? '';
+    if (this.oa.isEmailCreationBlocked(email)) {
+      // If you haven't added this i18n key yet, the fallback string still shows.
+      const msg =
+        this.translate.instant('oa.status.createBlockedByDomain', { email }) ||
+        'OA account not created: user belongs to an excluded email domain.';
+      return {
+        statusText: msg,
+        proxyDebugText: email ? `Blocked by email/domain rule: ${email}` : 'Blocked by email/domain rule.',
+        needsReload: false
+      };
+    }
+
+    // 1) Validate Alma user fields needed for OA
+    const validation = this.alma.validateUserForOA(user);
+
+    if (!validation.ok) {
+      const missingList = (validation.missing || []).join(', ');
+      return {
+        statusText: this.translate.instant('oa.status.createBlocked', {
+          fields: missingList
+        }),
+        proxyDebugText: this.translate.instant('oa.status.almaFieldsMissingCreate'),
+        needsReload: false
+      };
+    }
+
+    // 2) Build OA CREATE payload WITHOUT username (OA generates it)
+    const payload: OAAccountCreate = {
+      primary_id:      pid,
+      email:           validation.email!,
+      first_name:      validation.first_name!,
+      last_name:       validation.last_name!,
+      expires:         validation.expires!,
+      alma_group_code: validation.alma_group_code!
+    };
+
+    try {
+      const res = await this.oa.createAccount(payload);
+      let debug = JSON.stringify(res, null, 2);
+
+      // OA now returns the actual username it generated
+      const oaUsername =
+        (res as any)?.summary?.username ||
+        (res as any)?.raw?.username ||
+        pid;
+
+      let status: string;
+
+      if ((res as any).created) {
+        status = oaUsername
+          ? this.translate.instant('oa.status.createSuccessWithUser', { username: oaUsername })
+          : this.translate.instant('oa.status.createSuccess');
+
+      } else if ((res as any).alreadyExists) {
+        const reason =
+          (res as any).reason ||
+          'An account already exists for this user.';
+
+        status = oaUsername
+          ? this.translate.instant('oa.status.createAlreadyExistsWithUser', { username: oaUsername })
+          : this.translate.instant('oa.status.createAlreadyExists');
+
+        if (reason) status += ` — ${reason}`;
+
+      } else {
+        const reason =
+          (res as any).reason ||
+          this.translate.instant('oa.status.createFailed');
+
+        status = this.translate.instant('oa.status.createNotCreated', { reason });
+      }
+
+      let needsReload = false;
+
+      // 3) If we have an OA username, try to write it back to Alma
+      if (oaUsername && pid) {
+        try {
+          await this.alma.writeBackOAUsernameBoth(
+            pid,
+            oaUsername,
+            oaIdTypeCode,
+            primaryField,
+            secondaryField
+          );
+          status += ' ' + this.translate.instant('oa.status.suffixSavedToAlma');
+          needsReload = true;
+        } catch (almaErr: any) {
+          const msg =
+            almaErr?.message ||
+            this.translate.instant('oa.status.almaUpdateFailed');
+          status += ' ' + this.translate.instant('oa.status.suffixOAOkAlmaFailed');
+          debug += `\n\n[Alma write-back error]\n${msg}`;
+        }
+      }
+
+      return {
+        statusText: status,
+        proxyDebugText: debug,
+        oaUsername,
+        needsReload
+      };
+
+    } catch (e: any) {
+      const statusCode = e?.status;
+      const rawMsg = this.formatProxyError(e);
+
+      const lower = rawMsg.toLowerCase();
+
+      if (
+        (statusCode === 400 || statusCode === 409) &&
+        (lower.includes('already exist') ||
+         lower.includes('duplicate') ||
+         lower.includes('uniqueemail') ||
+         lower.includes('unique email'))
+      ) {
+        return {
+          statusText: this.translate.instant('oa.status.oaAlreadyExists'),
+          proxyDebugText: rawMsg,
+          needsReload: false
+        };
+      }
+
+      return {
+        statusText: this.translate.instant('oa.status.createFailed'),
+        proxyDebugText: this.formatProxyError(e),
+        needsReload: false
+      };
+    }
+  }
+
+  // -----------------------------
+  // SYNC WORKFLOW
+  // -----------------------------
+  async syncAccountWorkflow(
+    user: AlmaUser | null,
+    selectedUserId: string | null,
+    oaIdTypeCode: string,
+    primaryField: OAUsernameField,
+    secondaryField: OASecondaryField
+  ): Promise<OAWorkflowResult> {
+
+    const pid = user?.primary_id || selectedUserId || '';
+
+    if (!user && !selectedUserId) {
+      return { statusText: '', needsReload: false };
+    }
+
+    try {
+      // 1) Try to find an existing OA account by known identifiers
+      let got = await this.findOAAccount(user, oaIdTypeCode);
+      let oaUsername =
+        got?.account?.username ||
+        (got as any)?.normalizedUsername ||
+        '';
+
+      const missing: string[] = [];
+      const email = this.alma.getEmail(user) ?? '';
+      const first_name = String(user?.first_name ?? '').trim();
+      const last_name  = String(user?.last_name  ?? '').trim();
+
+      const rawExp =
+        (user as any)?.expiry_date ??
+        (user as any)?.expiration_date ??
+        '';
+      const expires = String(rawExp).slice(0, 10);
+
+      if (!pid)        missing.push('primary ID');
+      if (!email)      missing.push('email');
+      if (!first_name) missing.push('first name');
+      if (!last_name)  missing.push('last name');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(expires)) {
+        missing.push('expiry (YYYY-MM-DD)');
+      }
+
+      if (missing.length) {
+        return {
+          statusText: this.translate.instant('oa.status.syncBlocked', {
+            fields: missing.join(', ')
+          }),
+          proxyDebugText: this.translate.instant('oa.status.almaFieldsMissingModify'),
+          needsReload: false
+        };
+      }
+
+      const alma_group_code =
+        (user?.user_group as any)?.value ??
+        (user as any)?.user_group ??
+        '';
+
+      const modifyPayload: OAAccountModify = {
+        primary_id: pid,
+        email,
+        first_name,
+        last_name,
+        expires,
+        alma_group_code
+      };
+
+      // 2) Refresh a found OA account, or retain the existing username fallback.
+      if (oaUsername) {
+        const openathensId = got?.account?.id;
+        if (openathensId) {
+          modifyPayload.openathens_id = openathensId;
+        } else {
+          modifyPayload.username = oaUsername;
+        }
+
+        try {
+          const modRes = await this.oa.modifyAccount(modifyPayload);
+          got = await this.findOAAccount(user, oaIdTypeCode);
+          oaUsername =
+            got?.account?.username ||
+            (got as any)?.normalizedUsername ||
+            oaUsername;
+          if (got) {
+            (got as any).modifyResponse = modRes;
+          }
+        } catch (err: any) {
+          const handled = this.handleNotFoundLikeError(err);
+          if (handled) return handled;
+          throw err;
+        }
+      } else {
+        modifyPayload.username = pid;
+
+        try {
+          const modRes = await this.oa.modifyAccount(modifyPayload);
+          const debug = JSON.stringify(modRes, null, 2);
+
+          // After modify, re-query OA to confirm the account
+          got = await this.findOAAccount(user, oaIdTypeCode);
+          oaUsername =
+            got?.account?.username ||
+            (got as any)?.normalizedUsername ||
+            '';
+
+          if (!oaUsername) {
+            return {
+              statusText: this.translate.instant('oa.status.noOAFound'),
+              proxyDebugText: debug,
+              needsReload: false
+            };
+          }
+          if (got) {
+            (got as any).modifyResponse = modRes;
+          }
+        } catch (err: any) {
+          const handled = this.handleNotFoundLikeError(err);
+          if (handled) return handled;
+          throw err;
+        }
+      }
+
+      // 3) If we still have no OA account, report clearly and stop
+      if (!oaUsername) {
+        return {
+          statusText: this.translate.instant('oa.status.noOAFound'),
+          proxyDebugText: JSON.stringify(got ?? { found: false }, null, 2),
+          needsReload: false
+        };
+      }
+
+      // 4) OA account is confirmed — now attempt Alma write-back
+      let status = this.translate.instant('oa.status.syncSuccessWithUser', {
+        username: oaUsername
+      });
+      let debug = JSON.stringify({
+        account: got?.account,
+        modifyResponse: (got as any)?.modifyResponse
+      }, null, 2);
+      let needsReload = false;
+
+      try {
+        await this.alma.writeBackOAUsernameBoth(
+          pid,
+          oaUsername,
+          oaIdTypeCode,
+          primaryField,
+          secondaryField
+        );
+        status += ' ' + this.translate.instant('oa.status.suffixSavedToAlma');
+        needsReload = true;
+      } catch (almaErr: any) {
+        status += ' ' + this.translate.instant('oa.status.suffixOAOkAlmaFailed');
+        const msg =
+          almaErr?.message ||
+          this.translate.instant('oa.status.almaUpdateFailed');
+        debug += `\n\n[Alma write-back error]\n${msg}`;
+      }
+
+      return {
+        statusText: status,
+        proxyDebugText: debug,
+        oaUsername,
+        needsReload
+      };
+
+    } catch (e: any) {
+      const statusCode = e?.status;
+      const rawMsg = this.formatProxyError(e);
+
+      const lower = rawMsg.toLowerCase();
+      if (
+        (statusCode === 400 || statusCode === 409) &&
+        (lower.includes('already exist') ||
+         lower.includes('duplicate') ||
+         lower.includes('uniqueemail') ||
+         lower.includes('unique email'))
+      ) {
+        return {
+          statusText: this.translate.instant('oa.status.oaAlreadyExists'),
+          proxyDebugText: rawMsg,
+          needsReload: false
+        };
+      }
+
+      return {
+        statusText: this.translate.instant('oa.status.syncFailed'),
+        proxyDebugText: this.formatProxyError(e),
+        needsReload: false
+      };
+    }
+  }
+
+  // -----------------------------
+  // Private helpers
+  // -----------------------------
+
+  private async findOAAccount(
+    user: AlmaUser | null,
+    oaIdTypeCode: string
+  ): Promise<OAGetResponse | null> {
+    // Prefer OA username in Alma identifiers using configured id type code
+    // (then email, then primary_id) — handled by OAProxyService helper
+    return this.oa.findAccountByAlmaUser(user, this.alma, oaIdTypeCode as any);
+  }
+
+  /**
+   * Map OA 404 / OA_NOT_FOUND style errors to a result,
+   * or return null if the error should be handled generically.
+   */
+  private handleNotFoundLikeError(err: any): OAWorkflowResult | null {
+    const statusCode = err?.status;
+    const errBody = err?.error;
+    const rawMsg = this.formatProxyError(err);
+
+    const code = errBody?.code;
+    const bodyError =
+      typeof errBody?.error === 'string'
+        ? errBody.error.toLowerCase()
+        : '';
+    const lower = rawMsg.toLowerCase();
+
+    if (
+      statusCode === 404 ||
+      code === 'OA_NOT_FOUND' ||
+      bodyError.includes('not found') ||
+      lower.includes('not found')
+    ) {
+      return {
+        statusText: this.translate.instant('oa.status.noOAFound'),
+        proxyDebugText: errBody
+          ? JSON.stringify(errBody, null, 2)
+          : rawMsg,
+        needsReload: false
+      };
+    }
+
+    return null;
+  }
+}

@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest an improvement to the public Cloud App or API contract.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: Describe the user need without including personal data or nonpublic service information.
+  - type: textarea
+    id: problem
+    attributes:
+      label: User need
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Does this change the public API contract?
+      options:
+        - No
+        - Yes
+        - Unsure
+    validations:
+      required: true

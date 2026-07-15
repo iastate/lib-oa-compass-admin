@@ -1,0 +1,168 @@
+<!-- src/app/components/main/main.component.html -->
+<div class="oa-main-wrap">
+
+  <!-- ACTION BAR (above header, only in main view) -->
+  <ng-container *ngIf="isAuthorized && !authorizationLoading && !showSettings && !showConfig">
+    <div class="eca-actions oa-actions-row">
+      <!-- Reset -->
+      <button
+        mat-flat-button
+        type="button"
+        color="secondary"
+        (click)="onReset()"
+        [disabled]="(busy$ | async)">
+        {{ 'oa.actions.reset' | translate }}
+      </button>
+
+      <!-- Resend -->
+      <button
+        *ngIf="user"
+        mat-flat-button
+        type="button"
+        color="secondary"
+        (click)="resendActivation()"
+        [disabled]="(busy$ | async)">
+        {{ 'oa.actions.resend' | translate }}
+      </button>
+
+      <!-- Sync -->
+      <button
+        *ngIf="user"
+        mat-flat-button
+        type="button"
+        color="secondary"
+        (click)="syncOA()"
+        [disabled]="(busy$ | async)">
+        {{ 'oa.actions.sync' | translate }}
+      </button>
+
+      <!-- Primary action on the far right -->
+      <button
+        *ngIf="user"
+        mat-flat-button
+        type="button"
+        color="primary"
+        (click)="createOA()"
+        [disabled]="(busy$ | async)">
+        {{ 'oa.actions.create' | translate }}
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- HEADER -------------------------------------------------------------- -->
+  <oa-app-header
+    [settingsOpen]="showSettings"
+    [useEntityContext]="useEntityContext"
+    [entityContextUserId]="entityContextUserId"
+    [statusText]="actionStatus || ('oa.header.statusUserNotLoaded' | translate)"
+    [busy]="(busy$ | async) ?? false"
+    (toggleSettings)="toggleSettings()"
+    (toggleConfig)="toggleConfig()">
+  </oa-app-header>
+
+  <!-- SETTINGS VIEW ------------------------------------------------------- -->
+  <section *ngIf="isAuthorized && showSettings" class="oa-section oa-section--settings">
+    <oa-settings
+      (settingsChanged)="onSettingsChanged($event)">
+    </oa-settings>
+  </section>
+
+  <!-- CONFIG VIEW --------------------------------------------------------- -->
+  <section *ngIf="isAuthorized && showConfig" class="oa-section oa-section--settings">
+    <oa-config></oa-config>
+  </section>
+
+  <!-- MAIN CONTENT -------------------------------------------------------- -->
+  <section
+    *ngIf="!showSettings && !showConfig"
+    class="oa-section oa-section--content">
+
+    <div *ngIf="authorizationLoading" class="oa-alert oa-alert--info">
+      <strong>{{ 'oa.auth.checking' | translate }}</strong>
+    </div>
+
+    <div *ngIf="!authorizationLoading && !isAuthorized && !authorizationError" class="oa-alert oa-alert--error">
+      <strong>{{ 'oa.auth.deniedTitle' | translate }}</strong>
+      <p>{{ 'oa.auth.deniedMessage' | translate }}</p>
+      <p>{{ 'oa.auth.requiredRoles' | translate:{ roles: requiredOperatorRoles } }}</p>
+    </div>
+
+    <div *ngIf="!authorizationLoading && !isAuthorized && authorizationError" class="oa-alert oa-alert--error">
+      <strong>{{ 'oa.auth.errorTitle' | translate }}</strong>
+      <p>{{ 'oa.auth.errorMessage' | translate }}</p>
+      <p>{{ authorizationError }}</p>
+      <p>{{ 'oa.auth.requiredRoles' | translate:{ roles: requiredOperatorRoles } }}</p>
+    </div>
+
+    <!-- If no user yet, show the finder search -->
+    <ng-container *ngIf="!authorizationLoading && isAuthorized && !user; else selectedUserBlock">
+      <oa-user-search
+        [searchTerm]="searchTerm"
+        [searching]="searching"
+        [searchError]="searchError"
+        [showResults]="showResults"
+        [results]="results"
+        [moreAvailable]="moreAvailable"
+        (searchTermChange)="searchTerm = $event"
+        (searchRequested)="searchUsers()"
+        (clearRequested)="clearSearch()"
+        (loadMoreRequested)="loadMore()"
+        (userSelected)="selectUser($event)">
+      </oa-user-search>
+    </ng-container>
+
+    <!-- When we have a selected user (from search or entity context) -->
+    <ng-template #selectedUserBlock>
+      <ng-container *ngIf="!authorizationLoading && isAuthorized && user">
+
+        <mat-progress-bar
+          *ngIf="loadingUser"
+          mode="indeterminate"
+          class="oa-spinner">
+        </mat-progress-bar>
+
+        <div *ngIf="error" class="oa-alert oa-alert--error">
+          {{ error }}
+        </div>
+
+        <oa-user-shell
+          *ngIf="!loadingUser && !error"
+          [user]="user"
+          [selectedUserId]="selectedUserId"
+          [busy]="(busy$ | async) ?? false"
+          [actionStatus]="actionStatus"
+          [lastProxyResponse]="(lastProxyResponse$ | async) ?? ''"
+          [showDebugPanel]="showDebugPanel"
+          [displayName]="displayName()"
+          [email]="getEmail() || null"
+          [userGroup]="getUserGroupDisplay()"
+          [expiry]="getExpiryDisplay()"
+          [oaUsername]="oaUsernameDisplay"
+          (create)="createOA()"
+          (sync)="syncOA()"
+          (reload)="reload()"
+          (newSearch)="newSearch()">
+        </oa-user-shell>
+
+      </ng-container>
+    </ng-template>
+
+  </section>
+
+  <!-- GLOBAL LOADING OVERLAY (covers entire app content area) -->
+  <div class="oa-global-loading" *ngIf="searching">
+    <div class="oa-global-loading__backdrop"></div>
+
+    <div class="oa-global-loading__content">
+      <mat-progress-spinner
+        mode="indeterminate"
+        [diameter]="48">
+      </mat-progress-spinner>
+
+      <div class="oa-global-loading__label">
+        {{ 'oa.search.searching' | translate }}
+      </div>
+    </div>
+  </div>
+
+</div>
