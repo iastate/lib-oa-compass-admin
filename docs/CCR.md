@@ -82,7 +82,8 @@ manifest.
 
 - The package name is `@iastate/lib-oa-compass-admin` and remains private from
   npm publication.
-- Package, lockfile, and release preparation version remain `2.0.0` until the
+- Package and lockfile version identify the current frontend release. Version
+  `2.0.1` is an interface-compatible security correction to the `2.0.0`
   coordinated release.
 - Only frontend code and public interface documentation are permitted.
 - Public CI has read-only repository permission.

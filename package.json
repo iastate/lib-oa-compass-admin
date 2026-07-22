@@ -1,6 +1,6 @@
 {
   "name": "@iastate/lib-oa-compass-admin",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Public Ex Libris Cloud App for OpenAthens Compass account administration",
   "license": "Apache-2.0",
   "private": true,
@@ -17,17 +17,17 @@
     "check": "npm run build && npm run manifest:check && npm run contract:lint && npm run docs:check && npm run boundary:check"
   },
   "dependencies": {
-    "@angular/animations": "18.2.13",
+    "@angular/animations": "18.2.14",
     "@angular/cdk": "18.2.14",
-    "@angular/common": "18.2.13",
-    "@angular/compiler": "18.2.13",
-    "@angular/core": "18.2.13",
-    "@angular/forms": "18.2.13",
+    "@angular/common": "18.2.14",
+    "@angular/compiler": "18.2.14",
+    "@angular/core": "18.2.14",
+    "@angular/forms": "18.2.14",
     "@angular/language-service": "18.2.13",
     "@angular/material": "18.2.14",
-    "@angular/platform-browser": "18.2.13",
-    "@angular/platform-browser-dynamic": "18.2.13",
-    "@angular/router": "18.2.13",
+    "@angular/platform-browser": "18.2.14",
+    "@angular/platform-browser-dynamic": "18.2.14",
+    "@angular/router": "18.2.14",
     "@biesbjerg/ngx-translate-extract-marker": "1.0.0",
     "@exlibris/eca-components": "^2.0.2",
     "@exlibris/exl-cloudapp-angular-lib": "^2.0.2",
@@ -42,11 +42,11 @@
     "zone.js": "0.14.10"
   },
   "devDependencies": {
-    "@redocly/cli": "2.39.0",
-    "@angular-devkit/build-angular": "18.2.15",
-    "@angular/cli": "18.2.15",
-    "@angular/compiler-cli": "18.2.13",
+    "@angular-devkit/build-angular": "18.2.14",
+    "@angular/cli": "18.2.14",
+    "@angular/compiler-cli": "18.2.14",
     "@exlibris/exl-cloudapp-cli": "^2.0.2",
+    "@redocly/cli": "2.39.0",
     "@types/jasmine": "5.1.7",
     "@types/lodash": "4.17.16",
     "@types/node": "18.19.80",
@@ -60,5 +60,8 @@
     "postcss": "8.4.49",
     "typescript": "5.5.4",
     "yaml": "2.9.0"
+  },
+  "overrides": {
+    "tar": "7.5.21"
   }
 }

@@ -5,6 +5,15 @@
 Security fixes are applied to the current default branch and the latest
 published release.
 
+## Dependency validation
+
+Public CI installs the committed lockfile and rejects critical findings from
+the complete npm dependency tree. Release `2.0.1` temporarily overrides the
+build-time `tar` dependency to patched version `7.5.21` while the Ex Libris
+`2.0.2` SDK remains on its supported Angular 18 line. The override must be
+removed when an Ex Libris SDK update supplies a compatible patched dependency.
+Other upstream SDK and toolchain findings remain tracked in public issue `#2`.
+
 ## Reporting a vulnerability
 
 Use GitHub's private vulnerability reporting feature for this repository. If
