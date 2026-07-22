@@ -4,7 +4,7 @@
 
 Maintain the clean, frontend-only OA Compass Admin repository with a stable
 public OpenAPI boundary and contributor-safe automation. The clean-history
-cutover is complete; version `2.0.0` is prepared but remains unreleased.
+cutover and coordinated version `2.0.0` release are complete.
 
 ## Milestones
 
@@ -15,8 +15,8 @@ cutover is complete; version `2.0.0` is prepared but remains unreleased.
 - OpenAthens account lookup, creation, modification, and activation resend.
 - Configurable Alma username synchronization.
 - Status, notification, translation, and settings support.
-- Status: Implemented; production regression validation remains part of the
-  coordinated release.
+- Status: Implemented. Automated release validation passed; authenticated Alma
+  operator regression remains tracked in issue `#1`.
 
 ### M2 — Public interface
 
@@ -24,8 +24,8 @@ cutover is complete; version `2.0.0` is prepared but remains unreleased.
   operations.
 - TypeScript request and response models aligned with the documented API.
 - HTTPS-only frontend configuration and Cloud App bearer-token behavior.
-- Status: Implemented. Cross-repository equality becomes a blocking gate when
-  the clean public history is published.
+- Status: Implemented. Cross-repository equality passed as a blocking `2.0.0`
+  release gate.
 
 ### M3 — Public repository boundary
 
@@ -73,7 +73,12 @@ cutover is complete; version `2.0.0` is prepared but remains unreleased.
 - Record public commit, service commit, OpenAPI version, and immutable service
   release identifier in the compatibility record.
 - Run old/new compatibility checks and a post-release public-boundary audit.
-- Status: Planned after T21.
+- Status: Completed on 2026-07-22. Coordinated annotated tags and GitHub
+  releases were published, the proxy image passed its fixed-critical scan and
+  immutable deployment, production health/auth/CORS/log checks passed, and the
+  running digest was independently verified. Manual Alma regression and
+  frontend dependency remediation remain explicitly tracked in issues `#1`
+  and `#2`.
 
 ## Acceptance criteria
 
@@ -96,3 +101,6 @@ cutover is complete; version `2.0.0` is prepared but remains unreleased.
 - Clean-history publication is a separate, explicitly authorized task.
 - Private operational evidence is retained outside this public repository; the
   public tree records only the external API boundary and migration state.
+- The owner accepted automated release validation for `2.0.0`; manual Alma
+  regression and legacy frontend dependency remediation remain public,
+  accountable follow-up work rather than implied release accomplishments.
