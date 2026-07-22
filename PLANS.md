@@ -4,7 +4,9 @@
 
 Maintain the clean, frontend-only OA Compass Admin repository with a stable
 public OpenAPI boundary and contributor-safe automation. The clean-history
-cutover and coordinated version `2.0.0` release are complete.
+cutover and coordinated version `2.0.0` release are complete. Frontend patch
+`2.0.1` resolves the critical dependency finding reported during Ex Libris
+review without changing the external interface or proxy deployment.
 
 ## Milestones
 
@@ -80,9 +82,22 @@ cutover and coordinated version `2.0.0` release are complete.
   frontend dependency remediation remain explicitly tracked in issues `#1`
   and `#2`.
 
+### T23 — Ex Libris audit remediation and 2.0.1 patch
+
+- Keep the Ex Libris `2.0.2` SDK and application on the Angular 18.2 line.
+- Pin the transitive build-time `tar` package to patched version `7.5.21` and
+  reject critical npm audit findings in public CI.
+- Publish an interface-compatible frontend-only `2.0.1` release after clean
+  install, build, documentation, workflow, boundary, and secret checks pass.
+- Retain remaining non-critical upstream findings in issue `#2` and remove the
+  temporary override when an official Ex Libris SDK update supersedes it.
+- Status: In progress following the Ex Libris security-audit rejection of the
+  initial `2.0.0` Cloud App submission.
+
 ## Acceptance criteria
 
 - `npm ci` and `npm run check` pass on Node.js 22.
+- `npm audit --audit-level=critical` reports zero critical vulnerabilities.
 - A fresh candidate clone contains one root commit.
 - Only approved public files are present.
 - Root and bundled manifests match.
@@ -104,3 +119,6 @@ cutover and coordinated version `2.0.0` release are complete.
 - The owner accepted automated release validation for `2.0.0`; manual Alma
   regression and legacy frontend dependency remediation remain public,
   accountable follow-up work rather than implied release accomplishments.
+- The owner approved a temporary `tar@7.5.21` override for frontend release
+  `2.0.1` after isolated clean-install and full-build validation. The proxy
+  remains at compatible release `2.0.0` because the API is unchanged.

@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Reject critical dependency vulnerabilities
+        run: npm audit --audit-level=critical
+
       - name: Build and validate the public boundary
         run: npm run check
 

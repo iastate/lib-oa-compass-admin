@@ -24,7 +24,7 @@ const packageJson = JSON.parse(read('package.json'));
 const packageLock = JSON.parse(read('package-lock.json'));
 const lockRoot = packageLock.packages?.[''];
 assert.equal(packageJson.name, '@iastate/lib-oa-compass-admin');
-assert.equal(packageJson.version, '2.0.0');
+assert.equal(packageJson.version, '2.0.1');
 assert.equal(packageJson.license, 'Apache-2.0');
 assert.equal(packageJson.private, true);
 assert.equal(lockRoot?.name, packageJson.name);
