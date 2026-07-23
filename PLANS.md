@@ -91,8 +91,10 @@ review without changing the external interface or proxy deployment.
   install, build, documentation, workflow, boundary, and secret checks pass.
 - Retain remaining non-critical upstream findings in issue `#2` and remove the
   temporary override when an official Ex Libris SDK update supersedes it.
-- Status: In progress following the Ex Libris security-audit rejection of the
-  initial `2.0.0` Cloud App submission.
+- Status: Completed on 2026-07-22. Public release `v2.0.1` pins every affected
+  path to `tar@7.5.21`; clean-clone and tag CI reported zero critical findings
+  and passed the build, documentation, workflow, boundary, and secret checks.
+  Remaining non-critical upstream findings continue under issue `#2`.
 
 ## Acceptance criteria
 
