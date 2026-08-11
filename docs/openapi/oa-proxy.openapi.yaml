@@ -309,6 +309,30 @@ components:
       type: object
       additionalProperties: true
 
+    ExpiryResolution:
+      type: object
+      required:
+        - requested
+        - applied
+        - maximum
+        - capped
+      properties:
+        requested:
+          type: string
+          pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          description: Expiry date requested by the caller.
+        applied:
+          type: string
+          pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          description: Expiry date sent to OpenAthens after enforcing its five-year maximum.
+        maximum:
+          type: string
+          pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          description: Maximum OpenAthens expiry date calculated for this request in UTC.
+        capped:
+          type: boolean
+          description: Whether the requested expiry exceeded the maximum and was reduced.
+
     HealthResponse:
       type: object
       required:
@@ -398,7 +422,7 @@ components:
           description: The proxy writes this to OpenAthens attributes.surname.
         expires:
           type: string
-          description: Expiration date expected by the proxy as YYYY-MM-DD.
+          description: Expiration date accepted as YYYY-MM-DD and capped at the OpenAthens five-year maximum when necessary.
           pattern: "^\\d{4}-\\d{2}-\\d{2}$"
           example: "2027-06-09"
         password:
@@ -455,7 +479,7 @@ components:
           description: When supplied, the proxy writes this to OpenAthens attributes.surname.
         expires:
           type: string
-          description: Expiration date expected by the proxy as YYYY-MM-DD.
+          description: Expiration date accepted as YYYY-MM-DD and capped at the OpenAthens five-year maximum when necessary.
           pattern: "^\\d{4}-\\d{2}-\\d{2}$"
           example: "2027-06-09"
         status:
@@ -565,6 +589,8 @@ components:
             - $ref: "#/components/schemas/JsonObject"
         reason:
           type: string
+        expiryResolution:
+          $ref: "#/components/schemas/ExpiryResolution"
 
     ModifyAccountResponse:
       type: object
@@ -584,6 +610,8 @@ components:
           nullable: true
           allOf:
             - $ref: "#/components/schemas/JsonObject"
+        expiryResolution:
+          $ref: "#/components/schemas/ExpiryResolution"
 
     ResendActivationResponse:
       type: object

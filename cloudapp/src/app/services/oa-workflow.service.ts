@@ -8,6 +8,7 @@ import { OAProxyService } from './oa-proxy.service';
 import {
   OAAccountCreate,
   OAAccountModify,
+  OAAccountModifyResponse,
   OAGetResponse,
   OAResendRequest,
   OAResendResponse
@@ -207,6 +208,13 @@ export class OAWorkflowService {
         status = this.translate.instant('oa.status.createNotCreated', { reason });
       }
 
+      if ((res as any).created && res.expiryResolution?.capped) {
+        status += ' ' + this.translate.instant('oa.status.expiryCapped', {
+          requested: res.expiryResolution.requested,
+          applied: res.expiryResolution.applied
+        });
+      }
+
       let needsReload = false;
 
       // 3) If we have an OA username, try to write it back to Alma
@@ -289,6 +297,7 @@ export class OAWorkflowService {
         got?.account?.username ||
         (got as any)?.normalizedUsername ||
         '';
+      let modifyResponse: OAAccountModifyResponse | undefined;
 
       const missing: string[] = [];
       const email = this.alma.getEmail(user) ?? '';
@@ -344,14 +353,12 @@ export class OAWorkflowService {
 
         try {
           const modRes = await this.oa.modifyAccount(modifyPayload);
+          modifyResponse = modRes;
           got = await this.findOAAccount(user, oaIdTypeCode);
           oaUsername =
             got?.account?.username ||
             (got as any)?.normalizedUsername ||
             oaUsername;
-          if (got) {
-            (got as any).modifyResponse = modRes;
-          }
         } catch (err: any) {
           const handled = this.handleNotFoundLikeError(err);
           if (handled) return handled;
@@ -362,6 +369,7 @@ export class OAWorkflowService {
 
         try {
           const modRes = await this.oa.modifyAccount(modifyPayload);
+          modifyResponse = modRes;
           const debug = JSON.stringify(modRes, null, 2);
 
           // After modify, re-query OA to confirm the account
@@ -377,9 +385,6 @@ export class OAWorkflowService {
               proxyDebugText: debug,
               needsReload: false
             };
-          }
-          if (got) {
-            (got as any).modifyResponse = modRes;
           }
         } catch (err: any) {
           const handled = this.handleNotFoundLikeError(err);
@@ -397,13 +402,38 @@ export class OAWorkflowService {
         };
       }
 
+      const expiryResolution = modifyResponse?.expiryResolution;
+      if (expiryResolution) {
+        const actualExpiry = String(got?.account?.expiry ?? '').slice(0, 10);
+        if (actualExpiry !== expiryResolution.applied) {
+          return {
+            statusText: this.translate.instant('oa.status.syncExpiryMismatch', {
+              expected: expiryResolution.applied,
+              actual: actualExpiry || 'not reported'
+            }),
+            proxyDebugText: JSON.stringify({
+              account: got?.account,
+              modifyResponse
+            }, null, 2),
+            oaUsername,
+            needsReload: false
+          };
+        }
+      }
+
       // 4) OA account is confirmed — now attempt Alma write-back
       let status = this.translate.instant('oa.status.syncSuccessWithUser', {
         username: oaUsername
       });
+      if (expiryResolution?.capped) {
+        status += ' ' + this.translate.instant('oa.status.expiryCapped', {
+          requested: expiryResolution.requested,
+          applied: expiryResolution.applied
+        });
+      }
       let debug = JSON.stringify({
         account: got?.account,
-        modifyResponse: (got as any)?.modifyResponse
+        modifyResponse
       }, null, 2);
       let needsReload = false;
 
