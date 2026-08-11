@@ -124,3 +124,6 @@ review without changing the external interface or proxy deployment.
 - The owner approved a temporary `tar@7.5.21` override for frontend release
   `2.0.1` after isolated clean-install and full-build validation. The proxy
   remains at compatible release `2.0.0` because the API is unchanged.
+- Expiry dates beyond OpenAthens' five-year maximum are capped by the proxy,
+  returned as additive `expiryResolution` metadata, verified after sync, and
+  reported explicitly to the operator.

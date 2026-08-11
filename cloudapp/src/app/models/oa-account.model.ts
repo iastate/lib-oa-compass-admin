@@ -15,6 +15,13 @@ export interface OAAccount {
   permissionSets: string[];
 }
 
+export interface OAExpiryResolution {
+  requested: string;
+  applied: string;
+  maximum: string;
+  capped: boolean;
+}
+
 export interface OAVerifyRequest {
   username?: string;
   email?: string;
@@ -76,6 +83,9 @@ export interface OAAccountCreateResponse {
   /** Optional applied policy from OA, if your proxy exposes it */
   appliedPolicy?: any;
 
+  /** Requested and applied expiry dates when the proxy processed an expiry. */
+  expiryResolution?: OAExpiryResolution;
+
   /** Optional explanation when created === false (e.g. "uniqueEmailAddress in use") */
   reason?: string;
 }
@@ -100,6 +110,7 @@ export interface OAAccountModifyResponse {
   id: string;
   raw: any;
   appliedPolicy: any;
+  expiryResolution?: OAExpiryResolution;
 }
 
 export interface OAResendRequest {

@@ -70,6 +70,10 @@ The exact schemas, response codes, and reusable errors are canonical in
 `docs/openapi/oa-proxy.openapi.yaml`. TypeScript model names remain stable while
 OpenAPI version `1.0.0` is active.
 
+`OAExpiryResolution` records the requested Alma expiry, the calculated
+OpenAthens maximum, the applied date, and whether the request was capped. It is
+optional additive metadata on create and modify responses.
+
 ## Manifest contract
 
 `manifest.json` and `cloudapp/src/assets/manifest.json` must be byte-equivalent

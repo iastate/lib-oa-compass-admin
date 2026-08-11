@@ -40,6 +40,8 @@ interface is `docs/openapi/oa-proxy.openapi.yaml`, version `1.0.0`.
 - `GET /health` is public and reports service availability.
 - Every `/v1/oa/users/*` operation requires a bearer token.
 - Supported operations verify, retrieve, create, modify, and resend activation.
+- Create and modify responses can report requested, maximum, and applied expiry
+  dates when the proxy enforces the OpenAthens five-year limit.
 - The browser never receives or stores an OpenAthens service credential.
 
 The frontend obtains a token from `CloudAppEventsService.getAuthToken()` and
@@ -55,8 +57,10 @@ Other failures propagate to the workflow layer for safe user-facing handling.
 4. The operator selects an Alma user.
 5. The workflow reads identity values and queries the external service.
 6. The operator reviews the result and explicitly starts any mutation.
-7. After a successful account operation, configured Alma fields are updated.
-8. Status and notification components report the outcome without exposing
+7. The workflow confirms that the refreshed OpenAthens expiry matches the
+   proxy's applied expiry and reports any cap to the operator.
+8. After a successful account operation, configured Alma fields are updated.
+9. Status and notification components report the outcome without exposing
    tokens or sensitive response bodies.
 
 ## Configuration design
