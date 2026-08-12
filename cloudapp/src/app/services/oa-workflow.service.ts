@@ -403,22 +403,34 @@ export class OAWorkflowService {
       }
 
       const expiryResolution = modifyResponse?.expiryResolution;
-      if (expiryResolution) {
-        const actualExpiry = String(got?.account?.expiry ?? '').slice(0, 10);
-        if (actualExpiry !== expiryResolution.applied) {
-          return {
-            statusText: this.translate.instant('oa.status.syncExpiryMismatch', {
-              expected: expiryResolution.applied,
-              actual: actualExpiry || 'not reported'
-            }),
-            proxyDebugText: JSON.stringify({
-              account: got?.account,
-              modifyResponse
-            }, null, 2),
-            oaUsername,
-            needsReload: false
-          };
-        }
+      if (!expiryResolution) {
+        return {
+          statusText: this.translate.instant('oa.status.syncProxyIncompatible'),
+          proxyDebugText: JSON.stringify({
+            error: 'Proxy modify response is missing required expiryResolution metadata.',
+            requiredCapability: 'expiryResolution',
+            account: got?.account,
+            modifyResponse
+          }, null, 2),
+          oaUsername,
+          needsReload: false
+        };
+      }
+
+      const actualExpiry = String(got?.account?.expiry ?? '').slice(0, 10);
+      if (actualExpiry !== expiryResolution.applied) {
+        return {
+          statusText: this.translate.instant('oa.status.syncExpiryMismatch', {
+            expected: expiryResolution.applied,
+            actual: actualExpiry || 'not reported'
+          }),
+          proxyDebugText: JSON.stringify({
+            account: got?.account,
+            modifyResponse
+          }, null, 2),
+          oaUsername,
+          needsReload: false
+        };
       }
 
       // 4) OA account is confirmed — now attempt Alma write-back

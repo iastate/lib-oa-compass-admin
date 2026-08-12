@@ -44,6 +44,7 @@
       "syncing": "Syncing...",
       "syncFailed": "Sync failed",
       "syncExpiryMismatch": "Sync incomplete - OpenAthens expiry did not update (expected {{expected}}, found {{actual}}).",
+      "syncProxyIncompatible": "Sync failed - the OpenAthens proxy is outdated or incompatible because expiry verification metadata was not returned.",
       "syncBlocked": "Cannot update OpenAthens: missing {{fields}}",
       "syncSuccessWithUser": "Synced - OA username: {{username}}",
       "expiryCapped": "Alma expiry {{requested}} exceeds the OpenAthens five-year maximum; OpenAthens expiry was set to {{applied}}.",
