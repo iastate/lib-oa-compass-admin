@@ -22,15 +22,20 @@ export class AlmaUserService {
    * - expand=none
    * - format=json
    */
-  private async getFullUserRaw(primaryId: string): Promise<any> {
+  private async getFullUserRaw(primaryId: string, cacheBust = false): Promise<any> {
+    const queryParams: Record<string, string> = {
+      view: 'full',
+      expand: 'none',
+      format: 'json'
+    };
+    if (cacheBust) {
+      queryParams['_'] = Date.now().toString();
+    }
+
     return firstValueFrom(
       this.api.get<any>(
         `/almaws/v1/users/${encodeURIComponent(primaryId)}`,
-        {
-          view: 'full',
-          expand: 'none',
-          format: 'json'
-        }
+        queryParams
       )
     );
   }
@@ -40,6 +45,12 @@ export class AlmaUserService {
    */
   async getUser(primaryId: string): Promise<AlmaUser> {
     const user = await this.getFullUserRaw(primaryId);
+    return user as AlmaUser;
+  }
+
+  /** Get the latest committed FULL Alma user without a cached response. */
+  async getFreshUser(primaryId: string): Promise<AlmaUser> {
+    const user = await this.getFullUserRaw(primaryId, true);
     return user as AlmaUser;
   }
 

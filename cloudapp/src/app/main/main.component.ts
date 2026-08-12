@@ -648,17 +648,45 @@ export class MainComponent implements OnInit {
   // OA Resend / Sync / Create (via workflow service)
   // ---------------------------
 
+  private async refreshUserBeforeAction(): Promise<AlmaUser | null> {
+    const primaryId = this.user?.primary_id || this.selectedUserId || this.entityContextUserId || '';
+    this.state.setLastProxyResponse('');
+
+    if (!primaryId) {
+      this.actionStatus = this.translate.instant('oa.status.actionRefreshFailed');
+      return null;
+    }
+
+    this.actionStatus = this.translate.instant('oa.status.refreshingUser');
+
+    try {
+      const latest = await this.alma.getFreshUser(primaryId);
+      const refreshedUser = this.alma.normalizeFullUser(latest as any);
+      this.user = refreshedUser;
+      this.selectedUserId = refreshedUser.primary_id || primaryId;
+      this.state.setUser(refreshedUser);
+      return refreshedUser;
+    } catch {
+      this.actionStatus = this.translate.instant('oa.status.actionRefreshFailed');
+      this.state.setLastProxyResponse('');
+      return null;
+    }
+  }
+
   async resendActivation(): Promise<void> {
     if (!this.isAuthorized) return;
     if (!this.user && !this.selectedUserId) return;
 
     this.state.setBusy(true);
-    this.actionStatus = this.translate.instant('oa.status.resending');
     this.state.setLastProxyResponse('');
 
     try {
+      const refreshedUser = await this.refreshUserBeforeAction();
+      if (!refreshedUser) return;
+
+      this.actionStatus = this.translate.instant('oa.status.resending');
       const result = await this.oaWorkflow.resendActivationWorkflow(
-        this.user,
+        refreshedUser,
         this.selectedUserId
       );
 
@@ -680,39 +708,42 @@ export class MainComponent implements OnInit {
     if (!this.isAuthorized) return;
     if (!this.user && !this.selectedUserId) return;
 
-    // Read current email/domain from the loaded Alma user
-    const email = (this.alma.getEmail(this.user) || '').trim();
-    const domain = (email.split('@')[1] || '').trim().toLowerCase();
-
-    // ✅ Always read latest config at action time (prevents “must restart” behavior)
-    let disallowed = '';
-    try {
-      const cfgAny: any = await firstValueFrom(this.config.get());
-      disallowed = String(cfgAny?.disallowedEmailDomain || '')
-        .trim()
-        .toLowerCase();
-    } catch {
-      // ignore config load errors; treat as no restriction
-      disallowed = '';
-    }
-
-    // ✅ Block account creation for configured SSO/IDP domains (no restart needed)
-    if (disallowed && domain && domain === disallowed) {
-      this.actionStatus = this.translate.instant(
-        'oa.status.createBlockedByDomain',
-        { domain }
-      );
-      this.state.setLastProxyResponse('');
-      return;
-    }
-
     this.state.setBusy(true);
-    this.actionStatus = this.translate.instant('oa.status.creating');
     this.state.setLastProxyResponse('');
 
     try {
+      const refreshedUser = await this.refreshUserBeforeAction();
+      if (!refreshedUser) return;
+
+      // Read current email/domain from the freshly loaded Alma user.
+      const email = (this.alma.getEmail(refreshedUser) || '').trim();
+      const domain = (email.split('@')[1] || '').trim().toLowerCase();
+
+      // Always read latest config at action time.
+      let disallowed = '';
+      try {
+        const cfgAny: any = await firstValueFrom(this.config.get());
+        disallowed = String(cfgAny?.disallowedEmailDomain || '')
+          .trim()
+          .toLowerCase();
+      } catch {
+        // Ignore config load errors; treat as no restriction.
+        disallowed = '';
+      }
+
+      // Block account creation for configured SSO/IDP domains.
+      if (disallowed && domain && domain === disallowed) {
+        this.actionStatus = this.translate.instant(
+          'oa.status.createBlockedByDomain',
+          { domain }
+        );
+        this.state.setLastProxyResponse('');
+        return;
+      }
+
+      this.actionStatus = this.translate.instant('oa.status.creating');
       const result = await this.oaWorkflow.createAccountWorkflow(
-        this.user,
+        refreshedUser,
         this.selectedUserId,
         this.oaIdTypeCode,
         this.settings.oaPrimaryField,
@@ -737,26 +768,29 @@ export class MainComponent implements OnInit {
     if (!this.isAuthorized) return;
     if (!this.user && !this.selectedUserId) return;
 
-    // ✅ If user is in an excluded email domain, skip OA sync entirely
-    const email = this.alma.getEmail(this.user);
-    if (this.oaProxy.isEmailCreationBlocked(email)) {
-      const domain = (email?.split('@')[1] || '').trim().toLowerCase();
-
-      this.actionStatus =
-        this.translate.instant('oa.status.syncSkippedByDomain', { domain }) ||
-        `Sync skipped: users from ${domain || '(unknown domain)'} should authenticate via the University IDP.`;
-
-      this.state.setLastProxyResponse('');
-      return;
-    }
-
     this.state.setBusy(true);
-    this.actionStatus = this.translate.instant('oa.status.syncing');
     this.state.setLastProxyResponse('');
 
     try {
+      const refreshedUser = await this.refreshUserBeforeAction();
+      if (!refreshedUser) return;
+
+      // If the freshly loaded user is in an excluded email domain, skip OA sync.
+      const email = this.alma.getEmail(refreshedUser);
+      if (this.oaProxy.isEmailCreationBlocked(email)) {
+        const domain = (email?.split('@')[1] || '').trim().toLowerCase();
+
+        this.actionStatus =
+          this.translate.instant('oa.status.syncSkippedByDomain', { domain }) ||
+          `Sync skipped: users from ${domain || '(unknown domain)'} should authenticate via the University IDP.`;
+
+        this.state.setLastProxyResponse('');
+        return;
+      }
+
+      this.actionStatus = this.translate.instant('oa.status.syncing');
       const result = await this.oaWorkflow.syncAccountWorkflow(
-        this.user,
+        refreshedUser,
         this.selectedUserId,
         this.oaIdTypeCode,
         this.settings.oaPrimaryField,

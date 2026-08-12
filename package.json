@@ -1,6 +1,6 @@
 {
   "name": "@iastate/lib-oa-compass-admin",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Public Ex Libris Cloud App for OpenAthens Compass account administration",
   "license": "Apache-2.0",
   "private": true,
@@ -12,7 +12,7 @@
     "build": "eca build",
     "manifest:check": "node scripts/check-manifests.js",
     "contract:lint": "redocly lint docs/openapi/oa-proxy.openapi.yaml --config .redocly.yaml",
-    "docs:check": "node scripts/check-docs-consistency.js && node scripts/check-sync-compatibility.js",
+    "docs:check": "node scripts/check-docs-consistency.js && node scripts/check-sync-compatibility.js && node scripts/check-action-refresh.js",
     "boundary:check": "node scripts/check-public-boundary.js",
     "check": "npm run build && npm run manifest:check && npm run contract:lint && npm run docs:check && npm run boundary:check"
   },
