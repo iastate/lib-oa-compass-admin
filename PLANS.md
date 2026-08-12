@@ -125,8 +125,10 @@ contract.
   without requiring Reset.
 - Stop before any OpenAthens request when the latest committed Alma record
   cannot be loaded, and keep Reset as a manual recovery control.
-- Status: Implementation complete on 2026-08-12; frontend release and
-  authenticated Alma regression remain rollout gates.
+- Status: Completed on 2026-08-12. Public release `v2.0.4` was published from
+  commit `9f0362eb107a9f6c9e0a176c6e0c6ef25b9fd45f`; protected tag CI passed in
+  workflow run `31630670687`. Authenticated Alma regression remains an
+  operator validation follow-up.
 
 ## Acceptance criteria
 
