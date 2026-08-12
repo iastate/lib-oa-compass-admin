@@ -5,9 +5,10 @@
 Maintain the clean, frontend-only OA Compass Admin repository with a stable
 public OpenAPI boundary and contributor-safe automation. The clean-history
 cutover and coordinated version `2.0.0` release are complete. Frontend patches
-through `2.0.3` resolve dependency findings, report OpenAthens expiry
-adjustments, and fail closed against an incompatible proxy while preserving the
-version `1.0.0` request contract.
+through `2.0.4` resolve dependency findings, report OpenAthens expiry
+adjustments, fail closed against an incompatible proxy, and refresh committed
+Alma data before every OA action while preserving the version `1.0.0` request
+contract.
 
 ## Milestones
 
@@ -114,8 +115,18 @@ version `1.0.0` request contract.
   stop before Alma write-back when an outdated proxy omits it.
 - Extend the additive public health contract with proxy version, source commit,
   and immutable image digest for deployment identity verification.
-- Status: Implementation complete on 2026-08-12; protected-branch release and
-  coordinated production verification remain rollout gates.
+- Status: Completed on 2026-08-12 with frontend `2.0.3` and coordinated proxy
+  runtime identity verification in production.
+
+### T26 — Pre-action Alma refresh and 2.0.4 patch
+
+- Perform a cache-busted full-user read immediately before Create, Sync, and
+  Resend so Alma changes saved while the same entity remains selected are used
+  without requiring Reset.
+- Stop before any OpenAthens request when the latest committed Alma record
+  cannot be loaded, and keep Reset as a manual recovery control.
+- Status: Implementation complete on 2026-08-12; frontend release and
+  authenticated Alma regression remain rollout gates.
 
 ## Acceptance criteria
 
@@ -148,3 +159,5 @@ version `1.0.0` request contract.
 - Expiry dates beyond OpenAthens' five-year maximum are capped by the proxy,
   returned as additive `expiryResolution` metadata, verified after sync, and
   reported explicitly to the operator.
+- Create, Sync, and Resend treat a fresh committed Alma user read as a required
+  precondition; no background polling is used.

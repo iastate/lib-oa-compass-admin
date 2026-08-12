@@ -60,8 +60,11 @@ configured identifier, email address, and Alma primary identifier in order.
 Operators can create an account from eligible Alma identity data, update an
 existing account, or resend an activation message. The app shows progress,
 success, and actionable failure states and refreshes displayed account data
-after successful changes. Alma expiry dates beyond OpenAthens' five-year limit
-are capped at the current maximum and reported to the operator.
+after successful changes. Immediately before Create, Sync, or Resend, the app
+reloads the latest committed Alma user record so changes saved while the same
+user remains selected do not require a manual Reset. The action stops if that
+refresh fails. Alma expiry dates beyond OpenAthens' five-year limit are capped
+at the current maximum and reported to the operator.
 
 ### Alma synchronization
 

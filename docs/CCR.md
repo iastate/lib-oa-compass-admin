@@ -87,8 +87,9 @@ manifest.
 - The package name is `@iastate/lib-oa-compass-admin` and remains private from
   npm publication.
 - Package and lockfile version identify the current frontend release. Version
-  `2.0.3` adds fail-closed proxy compatibility enforcement and runtime health
-  identity documentation while retaining the OpenAPI `1.0.0` request contract.
+  `2.0.4` refreshes the committed Alma user before every OpenAthens action and
+  fails closed when that refresh is unavailable, while retaining the OpenAPI
+  `1.0.0` request contract.
 - Only frontend code and public interface documentation are permitted.
 - Public CI has read-only repository permission.
 - The production service hostname is permitted only in required frontend

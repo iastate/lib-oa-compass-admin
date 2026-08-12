@@ -58,12 +58,15 @@ Other failures propagate to the workflow layer for safe user-facing handling.
 2. The authorization guard verifies the operator role.
 3. The app loads institution configuration and normalizes field choices.
 4. The operator selects an Alma user.
-5. The workflow reads identity values and queries the external service.
-6. The operator reviews the result and explicitly starts any mutation.
-7. The workflow confirms that the refreshed OpenAthens expiry matches the
+5. The operator explicitly starts Create, Sync, or Resend.
+6. The app performs a cache-busted full-user read and stops the action if the
+   latest committed Alma record cannot be loaded.
+7. The workflow uses that refreshed identity data to query or mutate the
+   external service.
+8. The workflow confirms that the refreshed OpenAthens expiry matches the
    proxy's applied expiry and reports any cap to the operator.
-8. After a successful account operation, configured Alma fields are updated.
-9. Status and notification components report the outcome without exposing
+9. After a successful account operation, configured Alma fields are updated.
+10. Status and notification components report the outcome without exposing
    tokens or sensitive response bodies.
 
 ## Configuration design

@@ -29,6 +29,8 @@
     },
     "status": {
       "loadingUser": "Loading user...",
+      "refreshingUser": "Refreshing Alma user...",
+      "actionRefreshFailed": "Action cancelled: the latest Alma user record could not be loaded. Try again.",
       "userLoaded": "User loaded.",
       "loadFailed": "Failed to load user",
       "userLoadedWithOA": "User loaded - OA username in Alma: {{username}}",
