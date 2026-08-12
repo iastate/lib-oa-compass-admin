@@ -5,8 +5,9 @@
 Maintain the clean, frontend-only OA Compass Admin repository with a stable
 public OpenAPI boundary and contributor-safe automation. The clean-history
 cutover and coordinated version `2.0.0` release are complete. Frontend patches
-`2.0.1` and `2.0.2` resolve dependency findings and report OpenAthens expiry
-adjustments while preserving the version `1.0.0` request contract.
+through `2.0.3` resolve dependency findings, report OpenAthens expiry
+adjustments, and fail closed against an incompatible proxy while preserving the
+version `1.0.0` request contract.
 
 ## Milestones
 
@@ -106,6 +107,15 @@ adjustments while preserving the version `1.0.0` request contract.
   metadata while retaining OpenAPI version `1.0.0`.
 - Status: Completed on 2026-08-11 after coordinated proxy/frontend checks and
   protected-branch CI passed.
+
+### T25 — Proxy runtime identity and 2.0.3 compatibility guard
+
+- Require `expiryResolution` after every successful Sync modify operation and
+  stop before Alma write-back when an outdated proxy omits it.
+- Extend the additive public health contract with proxy version, source commit,
+  and immutable image digest for deployment identity verification.
+- Status: Implementation complete on 2026-08-12; protected-branch release and
+  coordinated production verification remain rollout gates.
 
 ## Acceptance criteria
 

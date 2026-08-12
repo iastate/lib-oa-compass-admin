@@ -37,11 +37,14 @@ with the OpenAPI schemas without requiring generated or shared runtime code.
 The frontend calls an independently operated HTTPS service. The authoritative
 interface is `docs/openapi/oa-proxy.openapi.yaml`, version `1.0.0`.
 
-- `GET /health` is public and reports service availability.
+- `GET /health` is public and reports service availability plus the proxy
+  version, full source commit, and immutable running-image digest.
 - Every `/v1/oa/users/*` operation requires a bearer token.
 - Supported operations verify, retrieve, create, modify, and resend activation.
 - Create and modify responses can report requested, maximum, and applied expiry
   dates when the proxy enforces the OpenAthens five-year limit.
+- Sync fails closed before Alma write-back when a proxy omits required
+  `expiryResolution` metadata.
 - The browser never receives or stores an OpenAthens service credential.
 
 The frontend obtains a token from `CloudAppEventsService.getAuthToken()` and

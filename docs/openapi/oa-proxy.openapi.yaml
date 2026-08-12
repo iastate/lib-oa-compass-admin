@@ -34,6 +34,9 @@ paths:
               example:
                 ok: true
                 service: oa-proxy
+                version: 2.0.1
+                commit: "170e30ac69131a0b77e289c21a922b3719798445"
+                imageDigest: "sha256:db4878a833bea4405cc32d3eb900f920546e2574acf3d4f6efc72525f2a9da10"
                 time: "2026-06-09T15:30:00.000Z"
 
   /v1/oa/users/verify:
@@ -338,6 +341,9 @@ components:
       required:
         - ok
         - service
+        - version
+        - commit
+        - imageDigest
         - time
       properties:
         ok:
@@ -346,6 +352,18 @@ components:
           type: string
           enum:
             - oa-proxy
+        version:
+          type: string
+          pattern: '^\d+\.\d+\.\d+$'
+          description: Semantic version baked into the running proxy image.
+        commit:
+          type: string
+          pattern: '^[0-9a-f]{40}$'
+          description: Full source commit baked into the running proxy image.
+        imageDigest:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'
+          description: Immutable digest supplied when the running container was deployed.
         time:
           type: string
           format: date-time
