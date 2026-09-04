@@ -77,3 +77,16 @@ by this app. Root and asset copies of the manifest must remain identical.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change and
 [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+
+## Operational Baseline (Tier 2 Vendor-Hosted)
+
+Ex Libris hosts and publishes this frontend; it is not a locally operated
+container or Apache service. The application owner approves releases and
+authenticated Alma regression; the vendor controls publication and vendor-side
+rollback.
+
+- Run `npm ci` and the repository's documented build/check commands before
+  release.
+- Validate the public/private OpenAPI contract and authenticated operator flow.
+- Record the frontend version, commit, vendor publication result, reviewer, and
+  prior vendor release. Do not add host-level deployment or systemd controls.
