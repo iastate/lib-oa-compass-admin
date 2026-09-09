@@ -5,7 +5,7 @@
 **Assessment mode:** Repository review plus remote commit verification
 
 OA Compass Admin is an Ex Libris-hosted Angular Cloud App. It is intentionally
-outside the default Django/VM/Podman application pattern and outside the future
+outside the default Django/VM/application-server pattern and outside the future
 Library Staff Portal: Alma and Ex Libris provide the operator context and
 short-lived Cloud App bearer token.
 
@@ -31,7 +31,7 @@ the Library team's direct control.
 | Standard area | Result | Evidence or exception |
 | --- | --- | --- |
 | Default Django/Python stack | Intentional exception | Angular 18/TypeScript is required by the Ex Libris Cloud App platform. |
-| Hosting and deployment | Intentional vendor exception | Ex Libris builds, hosts, and publishes the Cloud App; VM, Apache, Podman, Gunicorn, and self-hosted runner controls do not apply. |
+| Hosting and deployment | Intentional vendor exception | Ex Libris builds, hosts, and publishes the Cloud App; university VM, Apache, Gunicorn, and local deployment-runner controls do not apply. |
 | Data | Meets | The frontend does not own a persistent datastore and keeps OA credentials out of the browser. |
 | Entra / Staff Portal | Intentional exception | Alma operator context and Ex Libris Cloud App tokens authenticate the caller. The future Library Staff Portal is not the authentication boundary for this vendor-hosted app. |
 | Integration contract | Meets | The public OpenAPI contract is authoritative; typed services call the private proxy over HTTPS with bearer tokens, refresh once on `401`, and fail closed before Alma write-back when required expiry metadata is absent. |
@@ -52,4 +52,3 @@ the Library team's direct control.
    treat contract drift as a coordinated release concern.
 4. Keep vendor publication and rollback boundaries explicit; do not add local
    VM/container or Staff Portal requirements to this repository.
-
