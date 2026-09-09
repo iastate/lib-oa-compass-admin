@@ -130,6 +130,42 @@ contract.
   workflow run `31630670687`. Authenticated Alma regression remains an
   operator validation follow-up.
 
+### T27 — Standard follow-up and vendor-boundary maintenance
+
+1. **Authenticated Alma operator regression** — **Planned; issue `#1`.**
+   Exercise the supported Alma User Administrator and User Manager roles
+   through the Ex Libris-hosted test context. Verify authorized and denied
+   roles, user search, fresh Alma refresh, Create, Sync, Resend, expiry
+   reporting, and fail-closed behavior for an incompatible proxy. Record the
+   reviewer, test context, result, and vendor limitations externally; do not
+   store Alma user data or tokens in this repository.
+2. **Interactive accessibility review** — **Planned.** Perform a current
+   keyboard, focus, accessible-name, heading, contrast, responsive, and error
+   review in the hosted Cloud App test context. Retain sanitized evidence and
+   record remediation or accepted risk externally.
+3. **Public/private contract synchronization** — **Planned recurring control.**
+   Keep `docs/openapi/oa-proxy.openapi.yaml`, frontend TypeScript models, and
+   the private proxy implementation copy synchronized. Treat incompatible route,
+   security, request, or response changes as a coordinated release decision.
+4. **Dependency maintenance** — **Ongoing; issue `#2`.** Monitor remaining
+   non-critical upstream findings and remove the temporary `tar` override when
+   the Ex Libris SDK provides an equivalent patched dependency. Do not accept
+   critical findings in public CI.
+
+#### Explicitly deferred or outside this repository
+
+- Ex Libris publication and vendor-side rollback remain vendor-controlled.
+  Record the prior published version and release result externally; no local
+  VM, container, systemd, or rollback implementation is planned.
+- The future Library Staff Portal and Central IT Entra configuration do not
+  apply to this vendor-hosted Alma Cloud App. Do not create an individual
+  Entra registration solely for platform parity.
+
+#### Dismissed conformity work
+
+- Do not rewrite the Angular Cloud App as Django or add university-hosted
+  infrastructure merely to match the default application template.
+
 ## Acceptance criteria
 
 - `npm ci` and `npm run check` pass on Node.js 22.
