@@ -73,6 +73,8 @@ by this app. Root and asset copies of the manifest must remain identical.
 - `cloudapp/src/i18n/` — translated interface strings.
 - `docs/openapi/` — authoritative public API contract.
 - `docs/PB.md`, `docs/SDD.md`, `docs/CCR.md` — detailed canonical documents.
+- `docs/standard-assessment.md` — comparison with the Library clean-slate
+  application standard.
 - `PLANS.md` — public development and release plan.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change and
