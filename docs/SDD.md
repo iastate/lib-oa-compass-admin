@@ -16,6 +16,13 @@ search, account status, provisioning, settings, notifications, and shared user
 context. `MainComponent` coordinates the application-level experience and
 routes to focused screens.
 
+The authorized main view exposes named Settings and Configuration disclosure
+controls with expanded state. The panels are mutually exclusive and retain
+the selected user context. Embedded Save/Cancel completion closes the panel
+and returns focus to its opening control; standalone guarded routes return to
+the main route. Save prevents duplicate submissions, and failed saves keep
+the panel open with an announced error.
+
 ### Application services
 
 - `OperatorAuthorizationService` interprets the current Alma operator roles.
@@ -33,6 +40,15 @@ objects, account state, and institution settings. These models remain aligned
 with the OpenAPI schemas without requiring generated or shared runtime code.
 
 ## External proxy boundary
+
+During `eca start` development only, the Angular development build served on
+loopback port 4200 uses the fixed HTTPS destination
+`https://localhost:8443/oa-proxy`. Institution configuration cannot redirect
+that session to another service. The view displays this local destination and
+warns that Alma write-back remains enabled. No shared configuration is saved by
+this override. Production builds and all other hosts retain their configured
+HTTPS behavior. Local testing still requires an authorized disposable Alma
+sandbox account for Create or Sync.
 
 The frontend calls an independently operated HTTPS service. The authoritative
 interface is `docs/openapi/oa-proxy.openapi.yaml`, version `1.0.0`.

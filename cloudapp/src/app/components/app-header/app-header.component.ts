@@ -13,6 +13,8 @@ export class AppHeaderComponent {
    * Used for aria-pressed on the settings gear.
    */
   @Input() settingsOpen = false;
+  @Input() configOpen = false;
+  @Input() authorized = false;
 
   /**
    * Whether the app is currently bound to an Alma USER entity (Option A).

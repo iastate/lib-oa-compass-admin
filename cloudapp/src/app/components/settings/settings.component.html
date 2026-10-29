@@ -2,15 +2,15 @@
 
 <mat-card class="settings-card">
   <mat-card-title class="settings-title-row">
-    <span>{{ 'oa.settings.title' | translate }}</span>
+    <h1>{{ 'oa.settings.title' | translate }}</h1>
     <span class="settings-title-spacer"></span>
   </mat-card-title>
 
   <mat-card-content>
 
     <!-- Loading state -->
-    <div *ngIf="loading" class="settings-loading">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div *ngIf="loading" class="settings-loading" role="status" aria-live="polite" aria-atomic="true">
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'oa.settings.loading' | translate"></mat-progress-bar>
     </div>
 
     <form
@@ -19,9 +19,9 @@
 
       <!-- Display options (per-user) -->
       <section class="settings-section">
-        <h3 class="settings-section__title">
+        <h2 class="settings-section__title">
           {{ 'oa.settings.displayOptionsTitle' | translate }}
-        </h3>
+        </h2>
         <p class="settings-section__help">
           {{ 'oa.settings.displayOptionsHelp' | translate }}
         </p>
@@ -39,25 +39,27 @@
         <button
           mat-flat-button
           type="button"
+          [disabled]="saving"
           (click)="onCancel()">
-          Cancel
+          {{ 'oa.actions.cancel' | translate }}
         </button>
 
         <button
           mat-flat-button
           color="primary"
           type="button"
+          [disabled]="saving"
           (click)="onSave()">
-          Save
+          {{ 'oa.actions.save' | translate }}
         </button>
       </div>
 
       <!-- Messages -->
       <div class="settings-messages">
-        <span *ngIf="saved" class="settings-success">
+        <span *ngIf="saved" class="settings-success" role="status" aria-live="polite" aria-atomic="true">
           {{ 'oa.settings.savedMessage' | translate }}
         </span>
-        <span *ngIf="error" class="settings-error">
+        <span *ngIf="error" class="settings-error" role="alert" aria-atomic="true">
           {{ error }}
         </span>
       </div>

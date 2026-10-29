@@ -7,6 +7,12 @@
   position: relative; /* needed for the global loading overlay */
 }
 
+.oa-page-title {
+  margin: 8px 0;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
 /* Actions row under the header (uses Cloud App eca-actions pattern) */
 .oa-actions-row {
   display: flex;
@@ -14,7 +20,7 @@
   align-items: stretch;
   gap: 8px;
   margin: 8px 0 16px;
-  flex-wrap: nowrap;           /* <<< keep all four on a single row */
+  flex-wrap: wrap;
 }
 
 /* Make the four buttons visually similar width without clipping */

@@ -25,7 +25,7 @@
   </mat-form-field>
 
   <!-- Error line under the field -->
-  <div class="error" *ngIf="searchError">
+  <div class="error" *ngIf="searchError" role="alert" aria-atomic="true">
     {{ searchError }}
   </div>
 
@@ -34,7 +34,9 @@
     <mat-card *ngIf="results?.length; else emptyList" class="results-card">
       <mat-card-header class="results-header">
         <mat-card-title class="results-title">
-          {{ 'oa.search.resultsWithCount' | translate:{ count: results.length } }}
+          <span role="status" aria-live="polite" aria-atomic="true">
+            {{ 'oa.search.resultsWithCount' | translate:{ count: results.length } }}
+          </span>
         </mat-card-title>
 
         <button
@@ -50,10 +52,14 @@
         <mat-selection-list
           [multiple]="false"
           [hideSingleSelectionIndicator]="true"
+          (selectionChange)="onSelectionChange($event)"
+          [attr.aria-label]="'oa.search.resultsList' | translate"
           class="results-list">
           <mat-list-option
             *ngFor="let r of results; trackBy: trackUser"
-            (click)="onRowClick(r)">
+            [value]="r"
+            [attr.aria-label]="'oa.search.selectUser' | translate:{ name: r.first_name + ' ' + r.last_name, id: r.primary_id }"
+            >
             <div class="result-row">
               <div class="result-main">
                 <div class="result-name">
@@ -64,14 +70,9 @@
                 </div>
               </div>
 
-              <!-- Icon-only “chevron” select button -->
-              <button
-                mat-icon-button
-                type="button"
-                class="result-chevron"
-                [attr.aria-label]="'oa.search.selectUser' | translate">
+              <span class="result-chevron" aria-hidden="true">
                 <mat-icon>chevron_right</mat-icon>
-              </button>
+              </span>
             </div>
           </mat-list-option>
         </mat-selection-list>
@@ -79,7 +80,7 @@
     </mat-card>
 
     <ng-template #emptyList>
-      <div class="empty-results">
+      <div class="empty-results" role="status" aria-live="polite" aria-atomic="true">
         {{ 'oa.search.emptyResults' | translate }}
       </div>
     </ng-template>

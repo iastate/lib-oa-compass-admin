@@ -86,6 +86,8 @@ export class MainComponent implements OnInit {
   readonly requiredOperatorRoles = REQUIRED_ROLE_NAMES.join(', ');
   private entityWatchStarted = false;
 
+  get localProxyUrl(): string | null { return this.oaProxy.localProxyUrl; }
+
   constructor(
     private rest: CloudAppRestService,
     private config: CloudAppConfigService,
@@ -592,6 +594,7 @@ export class MainComponent implements OnInit {
 
   closeSettings(): void {
     this.showSettings = false;
+    document.getElementById('oa-settings-toggle')?.focus();
   }
 
   toggleConfig(): void {
@@ -604,6 +607,7 @@ export class MainComponent implements OnInit {
 
   closeConfig(): void {
     this.showConfig = false;
+    document.getElementById('oa-config-toggle')?.focus();
   }
 
   getEmail(): string | undefined {

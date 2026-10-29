@@ -67,8 +67,11 @@
   opacity: 0.75;
 }
 
-/* Icon-only “select” chevron */
+/* Decorative chevron; the containing list option is the sole control. */
 .result-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 32px;
   min-height: 32px;
 }

@@ -3,7 +3,7 @@
   <div class="app-header-main">
 
     <!-- OA Status line -->
-    <div class="app-status-line">
+    <div class="app-status-line" role="status" aria-live="polite" aria-atomic="true">
       <span class="app-status-label">
         {{ 'oa.header.statusLabel' | translate }}
       </span>
@@ -15,4 +15,18 @@
       </span>
     </div>
   </div>
+  <nav *ngIf="authorized" class="app-header-actions" [attr.aria-label]="'oa.header.navigation' | translate">
+    <button mat-stroked-button type="button" id="oa-settings-toggle"
+      [disabled]="busy" [attr.aria-expanded]="settingsOpen"
+      [attr.aria-controls]="settingsOpen ? 'oa-settings-panel' : null"
+      (click)="toggleSettings.emit()">
+      {{ 'oa.header.settings' | translate }}
+    </button>
+    <button mat-stroked-button type="button" id="oa-config-toggle"
+      [disabled]="busy" [attr.aria-expanded]="configOpen"
+      [attr.aria-controls]="configOpen ? 'oa-config-panel' : null"
+      (click)="toggleConfig.emit()">
+      {{ 'oa.header.configuration' | translate }}
+    </button>
+  </nav>
 </header>

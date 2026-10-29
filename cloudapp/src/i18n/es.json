@@ -1,5 +1,16 @@
 {
   "oa": {
+    "header": {
+      "title": "OA Compass Admin",
+      "localProxy": "Servicio local de pruebas. La escritura en Alma sigue habilitada:",
+      "navigation": "Navegación de OA Compass",
+      "settings": "Preferencias",
+      "configuration": "Configuración institucional"
+    },
+    "actions": {
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
     "auth": {
       "checking": "Verificando roles del operador de Alma...",
       "deniedStatus": "Acceso denegado",
@@ -9,6 +20,16 @@
       "requiredRoles": "Roles requeridos: {{roles}}",
       "errorTitle": "Falló la verificación de autorización",
       "errorMessage": "La aplicación no pudo verificar los roles del operador de Alma. El acceso permanece bloqueado hasta que la verificación tenga éxito."
+    },
+    "search": {
+      "resultsList": "Resultados de búsqueda",
+      "selectUser": "Seleccionar {{name}} (ID {{id}})"
+    },
+    "settings": {
+      "loading": "Cargando configuración personal..."
+    },
+    "config": {
+      "loading": "Cargando configuración institucional..."
     }
   }
 }

@@ -1,5 +1,5 @@
 // src/app/components/settings/settings.component.ts
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   CloudAppSettingsService,
   CloudAppConfigService,
@@ -9,6 +9,7 @@ import {
   DEFAULT_OA_SETTINGS,
 } from '../../models/oa-settings.model';
 import { Router } from '@angular/router';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'oa-settings',
@@ -18,6 +19,8 @@ import { Router } from '@angular/router';
 export class SettingsComponent implements OnInit {
 
   @Output() settingsChanged = new EventEmitter<OACompassSettings>();
+  @Input() embedded = false;
+  @Output() closed = new EventEmitter<void>();
 
   /**
    * Local view model used for:
@@ -85,7 +88,9 @@ export class SettingsComponent implements OnInit {
    * Cancel: discard unsaved changes and return to main state.
    */
   onCancel(): void {
-    this.router.navigate(['']);
+    if (this.saving) return;
+    if (this.embedded) this.closed.emit();
+    else this.router.navigate(['']);
   }
 
   /**
@@ -102,14 +107,15 @@ export class SettingsComponent implements OnInit {
       showDebugPanel: this.settings.showDebugPanel,
     };
 
-    this.settingsService.set(userPrefs).subscribe({
+    this.settingsService.set(userPrefs).pipe(take(1)).subscribe({
       next: () => {
         this.saving = false;
         this.saved = true;
         // Emit full settings so MainComponent can refresh debug panel state (if used)
         this.settingsChanged.emit({ ...this.settings });
         // Return to main state
-        this.router.navigate(['']);
+        if (this.embedded) this.closed.emit();
+        else this.router.navigate(['']);
       },
       error: (e) => {
         this.saving = false;

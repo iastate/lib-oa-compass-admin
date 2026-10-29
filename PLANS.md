@@ -2,6 +2,17 @@
 
 ## Current objective
 
+Development validation (2026-10-29): loopback ECA development sessions on port
+4200 use a fixed local HTTPS test destination without saving institution
+configuration. Production builds keep existing HTTPS configuration behavior.
+The local destination is visible, with an Alma write-back warning. Authenticated
+sandbox acceptance remains pending; use an authorized disposable test account.
+The final candidate production build and all `npm run check` stages passed on
+2026-10-29, including 13 behavior tests, synchronized manifests, contract lint,
+documentation/sync/action-refresh checks, and the public-boundary scan. Targeted
+secret scans of services and tests passed. This is local implementation evidence;
+authenticated browser acceptance and candidate publication remain pending.
+
 Maintain the clean, frontend-only OA Compass Admin repository with a stable
 public OpenAPI boundary and contributor-safe automation. The clean-history
 cutover and coordinated version `2.0.0` release are complete. Frontend patches
@@ -147,6 +158,12 @@ contract.
    Keep `docs/openapi/oa-proxy.openapi.yaml`, frontend TypeScript models, and
    the private proxy implementation copy synchronized. Treat incompatible route,
    security, request, or response changes as a coordinated release decision.
+   - 2026-10-23 verification: the checked-out public contract and proxy
+     `contracts/oa-proxy.openapi.yaml` are byte-for-byte identical (SHA-256
+     `9D77F45367EB01DEA247619BA4E1D3C21C0B26125FE1BAF3330A39A54575059D`).
+     The proxy's fetch-based `contract:drift` check could not reach public
+     `main` in this environment; rerun it in network-enabled CI to verify the
+     remote copy. No interface change was needed.
 4. **Dependency maintenance** — **Ongoing; issue `#2`.** Monitor remaining
    non-critical upstream findings and remove the temporary `tar` override when
    the Ex Libris SDK provides an equivalent patched dependency. Do not accept
@@ -165,6 +182,27 @@ contract.
 
 - Do not rewrite the Angular Cloud App as Django or add university-hosted
   infrastructure merely to match the default application template.
+
+### T28 — Accessible navigation and interaction candidate (2.0.5)
+
+- [x] Preserve and review the existing accessibility edits for status/error
+  announcements, search result selection, authorization, and heading structure.
+- [x] Add authorized Settings/Configuration controls with expanded state and
+  mutually exclusive panels. Preserve the selected-user context; embedded
+  Save/Cancel closes correctly and returns focus to the opening control.
+- [x] Add behavioral tests for role gating, panel transitions, focus return,
+  successful/failed saves, duplicate submission prevention, and search selection.
+- [x] Complete clean-install/build, public-boundary, manifest, contract,
+  dependency, and history-secret checks for the final candidate.
+- [ ] Publish a reviewed candidate and pass hosted CI.
+- [ ] Complete authenticated role regression and interactive accessibility
+  validation in the owner-selected Alma sandbox context, then record sanitized
+  acceptance. Verify the intended service destination before account changes.
+- [ ] Obtain release approval and complete vendor publication/recovery evidence.
+
+The public OpenAPI remains `1.0.0`; this work does not change service-owned
+policy or request/response fields. Local component tests are not evidence of
+screen-reader behavior or a completed hosted regression.
 
 ## Acceptance criteria
 

@@ -1,6 +1,9 @@
 <div
   *ngIf="message"
   class="oa-toast"
+  [attr.role]="type === 'error' ? 'alert' : 'status'"
+  [attr.aria-live]="type === 'error' ? 'assertive' : 'polite'"
+  aria-atomic="true"
   [ngClass]="{
     'oa-toast--success': type === 'success',
     'oa-toast--warning': type === 'warning',
