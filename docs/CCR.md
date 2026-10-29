@@ -37,6 +37,7 @@ to code, tests, and this document.
 | `AlmaWSRestService` | Typed wrapper for Alma REST interactions. |
 | `EntityContextService` | Tracks the active Cloud App entity. |
 | `OAProxyService` | Performs typed authenticated calls to the external API. |
+| `localDevelopmentProxy` | Selects the fixed HTTPS test destination only for loopback ECA development builds on port 4200. |
 | `OAWorkflowService` | Coordinates account and Alma synchronization flows. |
 | `StateService` | Holds shared frontend state. |
 
@@ -89,7 +90,9 @@ manifest.
 - Package and lockfile version identify the current frontend release. Version
   `2.0.4` refreshes the committed Alma user before every OpenAthens action and
   fails closed when that refresh is unavailable, while retaining the OpenAPI
-  `1.0.0` request contract.
+  `1.0.0` request contract. Candidate `2.0.5` retains those safeguards and adds
+  accessible Settings/Configuration entry points, embedded panel completion,
+  semantic headings, selection-list behavior, and live status/error messages.
 - Only frontend code and public interface documentation are permitted.
 - Public CI has read-only repository permission.
 - The production service hostname is permitted only in required frontend

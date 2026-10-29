@@ -8,6 +8,11 @@
   align-items: center;
 }
 
+.settings-title-row h1 {
+  margin: 0;
+  font: inherit;
+}
+
 .settings-title-spacer {
   flex: 1 1 auto;
 }

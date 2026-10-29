@@ -1,14 +1,14 @@
 <mat-card class="config-card oa-config-root">
   <mat-card-title class="config-title-row">
-    <span>{{ 'oa.config.title' | translate }}</span>
+    <h1>{{ 'oa.config.title' | translate }}</h1>
     <span class="config-title-spacer"></span>
   </mat-card-title>
 
   <mat-card-content>
 
     <!-- Loading state -->
-    <div *ngIf="loading" class="config-loading">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div *ngIf="loading" class="config-loading" role="status" aria-live="polite" aria-atomic="true">
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'oa.config.loading' | translate"></mat-progress-bar>
     </div>
 
     <!-- Main form -->
@@ -16,9 +16,9 @@
 
       <!-- Proxy / connection settings -->
       <section class="config-section">
-        <h3 class="config-section__title">
+        <h2 class="config-section__title">
           {{ 'oa.config.proxyTitle' | translate }}
-        </h3>
+        </h2>
         <p class="config-section__help">
           {{ 'oa.config.proxyHelp' | translate }}
         </p>
@@ -37,9 +37,9 @@
 
       <!-- Email exclusion (institution-wide) -->
       <section class="config-section">
-        <h3 class="config-section__title">
+        <h2 class="config-section__title">
           {{ 'oa.config.emailExclusionTitle' | translate }}
-        </h3>
+        </h2>
         <p class="config-section__help">
           {{ 'oa.config.emailExclusionHelp' | translate }}
         </p>
@@ -58,9 +58,9 @@
 
       <!-- OA username storage (institution-wide) -->
       <section class="config-section">
-        <h3 class="config-section__title">
+        <h2 class="config-section__title">
           {{ 'oa.config.usernameStorageTitle' | translate }}
-        </h3>
+        </h2>
         <p class="config-section__help">
           {{ 'oa.config.usernameStorageHelp' | translate }}
         </p>
@@ -103,21 +103,21 @@
 
       <!-- Actions -->
       <div class="oa-footer-actions">
-        <button mat-flat-button type="button" (click)="onCancel()">
-          Cancel
+        <button mat-flat-button type="button" [disabled]="saving" (click)="onCancel()">
+          {{ 'oa.actions.cancel' | translate }}
         </button>
 
-        <button mat-flat-button color="primary" type="button" (click)="onSave()">
-          Save
+        <button mat-flat-button color="primary" type="button" [disabled]="saving" (click)="onSave()">
+          {{ 'oa.actions.save' | translate }}
         </button>
       </div>
 
       <!-- Messages -->
       <div class="config-messages">
-        <span *ngIf="saved" class="config-success">
+        <span *ngIf="saved" class="config-success" role="status" aria-live="polite" aria-atomic="true">
           {{ 'oa.config.savedMessage' | translate }}
         </span>
-        <span *ngIf="error" class="config-error">
+        <span *ngIf="error" class="config-error" role="alert" aria-atomic="true">
           {{ error }}
         </span>
       </div>

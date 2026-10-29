@@ -14,6 +14,16 @@ build-time `tar` dependency to patched version `7.5.21` while the Ex Libris
 removed when an Ex Libris SDK update supplies a compatible patched dependency.
 Other upstream SDK and toolchain findings remain tracked in public issue `#2`.
 
+Candidate `2.0.5` additionally pins compatible transitive fixes for `piscina`
+`4.9.4`, `proxy-addr` `2.0.8`, and `shell-quote` `1.11.0`. These address
+[GHSA-67c8-pqhq-4rmx](https://github.com/advisories/GHSA-67c8-pqhq-4rmx),
+[GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h), and
+[GHSA-pqg4-j6r4-53mv](https://github.com/advisories/GHSA-pqg4-j6r4-53mv)
+within the SDK's existing major versions. Clean install, the critical-audit
+gate, production compilation, and component checks must pass together.
+Remove these overrides when the supported SDK supplies equivalent patched
+versions. Non-critical findings remain tracked; this is not a clean-audit claim.
+
 ## Reporting a vulnerability
 
 Use GitHub's private vulnerability reporting feature for this repository. If

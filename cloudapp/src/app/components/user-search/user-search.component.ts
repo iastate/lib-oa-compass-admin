@@ -1,5 +1,6 @@
 // src/app/components/user-search/user-search.component.ts
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatSelectionListChange } from '@angular/material/list';
 import { AlmaUserLite } from '../../models/alma-user.model';
 
 @Component({
@@ -44,7 +45,8 @@ export class UserSearchComponent {
     this.loadMoreRequested.emit();
   }
 
-  onRowClick(user: AlmaUserLite): void {
-    this.userSelected.emit(user);
+  onSelectionChange(change: MatSelectionListChange): void {
+    const selectedUser = change.options.find(option => option.selected)?.value as AlmaUserLite | undefined;
+    if (selectedUser) this.userSelected.emit(selectedUser);
   }
 }

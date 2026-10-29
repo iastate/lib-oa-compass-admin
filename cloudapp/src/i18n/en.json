@@ -1,11 +1,16 @@
 {
   "oa": {
     "header": {
+      "title": "OA Compass Admin",
+      "localProxy": "Local test proxy. Alma write-back remains enabled:",
       "statusLabel": "OA Status:",
       "statusUserNotLoaded": "User not loaded",
       "working": "(working...)",
       "openConfig": "Open OA Compass configuration (institution-level)",
-      "openSettings": "OA Compass settings"
+      "openSettings": "OA Compass settings",
+      "navigation": "OA Compass navigation",
+      "settings": "Settings",
+      "configuration": "Configuration"
     },
     "actions": {
       "reset": "Reset",
@@ -22,6 +27,8 @@
       "searching": "Searching...",
       "placeholder": "Search by name, ID, email, barcode...",
       "searchButton": "Search",
+      "resultsList": "Search results",
+      "selectUser": "Select {{name}} (ID {{id}})",
       "resultsWithCount": "Results ({{count}})",
       "loadMore": "Load more",
       "emptyResults": "No matching users found.",
@@ -91,6 +98,7 @@
     },
     "settings": {
       "title": "OA Compass settings",
+      "loading": "Loading settings...",
       "usernameStorageTitle": "OA username storage",
       "usernameStorageHelp": "These settings are configured at the institution level in the Configuration view and apply to all OA Compass users.",
       "primaryFieldLabel": "Primary field",
@@ -102,8 +110,9 @@
     },
     "config": {
       "title": "OA Compass configuration",
+      "loading": "Loading configuration...",
       "proxyTitle": "Proxy connection",
-      "proxyHelp": "Configure how the Cloud App reaches your hardened OA proxy. This should be the Apache URL that reverse-proxies to the Node.js service listening on 127.0.0.1:8081.",
+      "proxyHelp": "Enter the HTTPS base URL provided by your application administrator.",
       "proxyBaseUrlLabel": "Proxy base URL",
       "usernameStorageTitle": "OA username storage",
       "usernameStorageHelp": "Choose how Alma should store the OpenAthens username when accounts are created or synced. These settings apply to all OA Compass Admin users in this Alma environment.",
