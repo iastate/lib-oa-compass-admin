@@ -14,7 +14,8 @@ The dated inventory below records the candidate after compatible updates.
 No residual-risk exception is approved by this document. Public issue
 [#2](https://github.com/iastate/lib-oa-compass-admin/issues/2) requires every
 critical/high finding to be remediated or have an owner-approved applicability
-assessment and follow-up date. That approval remains pending. Passing the
+assessment and follow-up date. On 2026-11-02 the application owner chose to keep
+LIBDEV-3281 open pending vendor guidance, with no risk exception. Passing the
 existing critical-only CI gate does not establish high-finding acceptance.
 
 The application owner should review the residual findings before release.
@@ -117,7 +118,8 @@ dependency/devDependency label alone. A build or runtime exploit was not tested.
   and public-boundary checks: passed locally on Node 22.
 - All remaining packages classified: inventory below, generated from the audit.
 - Vendor request: prepared, not submitted.
-- Owner-approved high-risk applicability/exception decision: pending.
+- Owner decision on 2026-11-02: keep LIBDEV-3281 open pending vendor guidance;
+  no residual-risk exception approved. Remaining findings are not accepted for closure.
 - Authenticated regression for this dependency set and release approval: pending.
 
 Do not close issue #2 or claim the dependency tree is vulnerability-free from
@@ -139,7 +141,7 @@ Newly reported package entries: `express`.
 
 Assessed package-lock.json SHA-256: `02042a84899087df5b3d5f59e19f6e6aef685040e84fdd4ded1642c5a98a65a2`.
 
-For each unresolved row, use the group assessment above; owner approval remains pending. Maintainer: application maintainer. Approval owner: application owner. Proposed review date: 2026-11-09 or before release. Advisory references are identifiers, not reproduced exploit instructions.
+For each unresolved row, use the group assessment above. Owner disposition: keep open pending vendor guidance; no risk exception. Maintainer: application maintainer. Approval owner: application owner. Proposed review date: 2026-11-09 or before release. Advisory references are identifiers, not reproduced exploit instructions.
 
 | Package | Severity | Affected installed versions | Group | Advisory or inherited source |
 | --- | --- | --- | --- | --- |
