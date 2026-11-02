@@ -168,6 +168,18 @@ contract.
    non-critical upstream findings and remove the temporary `tar` override when
    the Ex Libris SDK provides an equivalent patched dependency. Do not accept
    critical findings in public CI.
+   LIBDEV-3281 review on 2026-11-02: the dedicated dependency-review candidate
+   updates the Ex Libris SDK set to 2.1.0, compatible direct dependencies, and
+   selected transitive resolutions. Clean install, critical gate, full build,
+   13 behavior tests, contract/docs/public checks passed. The audit changed from
+   81 entries (33 high, 42 moderate, six low) to 69 (20 high, 43 moderate, six
+   low), with zero critical in both snapshots. See
+   `docs/dependency-review-2026-11-02.md` for every remaining package/advisory,
+   applicability group, proposed 2026-11-09 review date, and vendor-request draft.
+   The owner decided on 2026-11-02 to keep LIBDEV-3281 open pending vendor
+   guidance, with no risk exception. Vendor submission/response and authenticated
+   regression for the new dependencies remain pending. Do not
+   mark issue `#2` or full dependency acceptance complete from CI alone.
 
 #### Explicitly deferred or outside this repository
 

@@ -24,6 +24,16 @@ gate, production compilation, and component checks must pass together.
 Remove these overrides when the supported SDK supplies equivalent patched
 versions. Non-critical findings remain tracked; this is not a clean-audit claim.
 
+The LIBDEV-3281 dependency-review candidate updates the SDK set to 2.1.0,
+Lodash to 4.18.1, PostCSS to 8.5.32, UUID to 11.1.1, and compatible transitive
+resolutions while retaining Angular 18 and the existing overrides. The dated
+[dependency assessment](docs/dependency-review-2026-11-02.md) classifies every
+remaining audit entry, records release impact, and provides a vendor-request
+draft. It reports zero critical but 20 high findings; no residual-risk exception
+or vendor response is implied. The owner chose on 2026-11-02 to keep LIBDEV-3281
+open pending vendor guidance, with no risk exception. Resolution of the remaining
+findings and updated authenticated regression remain release requirements.
+
 ## Reporting a vulnerability
 
 Use GitHub's private vulnerability reporting feature for this repository. If
