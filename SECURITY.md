@@ -30,8 +30,9 @@ resolutions while retaining Angular 18 and the existing overrides. The dated
 [dependency assessment](docs/dependency-review-2026-11-02.md) classifies every
 remaining audit entry, records release impact, and provides a vendor-request
 draft. It reports zero critical but 20 high findings; no residual-risk exception
-or vendor response is implied. Owner review and updated authenticated regression
-remain release requirements.
+or vendor response is implied. The owner chose on 2026-11-02 to keep LIBDEV-3281
+open pending vendor guidance, with no risk exception. Resolution of the remaining
+findings and updated authenticated regression remain release requirements.
 
 ## Reporting a vulnerability
 

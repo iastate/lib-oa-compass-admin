@@ -176,8 +176,9 @@ contract.
    low), with zero critical in both snapshots. See
    `docs/dependency-review-2026-11-02.md` for every remaining package/advisory,
    applicability group, proposed 2026-11-09 review date, and vendor-request draft.
-   Owner-approved residual-risk decisions, vendor submission/response, and
-   authenticated regression for the new dependencies remain pending. Do not
+   The owner decided on 2026-11-02 to keep LIBDEV-3281 open pending vendor
+   guidance, with no risk exception. Vendor submission/response and authenticated
+   regression for the new dependencies remain pending. Do not
    mark issue `#2` or full dependency acceptance complete from CI alone.
 
 #### Explicitly deferred or outside this repository
