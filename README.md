@@ -36,9 +36,10 @@ npm run build
 npm run check
 ```
 
-The complete check builds the Cloud App, compares both manifests, lints the
-OpenAPI document, verifies canonical documentation, and enforces the public
-repository boundary.
+The complete check builds the Cloud App, runs behavioral tests for operator
+authorization and UI behavior, compares both manifests, lints the OpenAPI
+document, verifies canonical documentation, and enforces the public repository
+boundary.
 
 ## Operator workflow
 
