@@ -4,12 +4,34 @@ Reviewed 2026-11-02, based on candidate 2.0.5 / parent commit 233a1c6.
 This assessment covers the public Cloud App and its development/build tools.
 It does not assess the independent external API service.
 
+## Revalidation — 2026-11-09
+
+On a temporary local rebase of PR #14's dependency candidate onto `main` at
+`8368443`, a lockfile-only update moved all four `brace-expansion` entries from
+2.1.2/1.1.16 to 2.1.7/1.1.21. `package.json` did not change. `npm ci` and
+`npm run check` passed, including the production build, all 13 behavior tests,
+manifest, contract, documentation, and public-boundary checks.
+
+The refreshed full audit reports 63 affected package entries: 19 high, 38
+moderate, six low, zero critical. `npm audit --omit=dev` reports 60 entries:
+18 high, 36 moderate, six low, zero critical. The high count fell by one from
+the Nov 2 snapshot. These are affected package entries, not counts of distinct
+vulnerabilities or proof of browser execution. The omit-dev report still
+contains build and SDK tooling because npm's dependency graph is not the
+published browser bundle. Only `@exlibris/exl-cloudapp-cli` among the prior high
+entries is omitted by that audit.
+
+This is a local, uncommitted validation candidate; PR #14 has not been rebased
+or updated on GitHub. The Nov 2 inventory below remains the historical snapshot.
+LIBDEV-3281 remains open pending vendor guidance, no risk exception is approved,
+and authenticated regression for this dependency set remains pending.
+
 ## Result and release impact
 
-The fresh baseline npm audit reports 81 affected package entries: 33 high,
-42 moderate, six low, zero critical. These counts include inherited parent
-findings and are not counts of independent vulnerabilities or reachable exploits.
-The dated inventory below records the candidate after compatible updates.
+The Nov 2 baseline audit reported 81 affected package entries: 33 high, 42
+moderate, six low, zero critical. These counts include inherited parent findings
+and are not counts of independent vulnerabilities or reachable exploits. The
+dated inventory below records the Nov 2 candidate after compatible updates.
 
 No residual-risk exception is approved by this document. Public issue
 [#2](https://github.com/iastate/lib-oa-compass-admin/issues/2) requires every

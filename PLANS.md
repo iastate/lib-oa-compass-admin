@@ -173,9 +173,14 @@ contract.
    selected transitive resolutions. Clean install, critical gate, full build,
    13 behavior tests, contract/docs/public checks passed. The audit changed from
    81 entries (33 high, 42 moderate, six low) to 69 (20 high, 43 moderate, six
-   low), with zero critical in both snapshots. See
-   `docs/dependency-review-2026-11-02.md` for every remaining package/advisory,
-   applicability group, proposed 2026-11-09 review date, and vendor-request draft.
+   low), with zero critical in both snapshots. On 2026-11-09, a temporary local
+   rebase onto current `main` and a lockfile-only `brace-expansion` update passed
+   `npm ci` and `npm run check`; the refreshed audit is 63 entries (19 high, 38
+   moderate, six low, zero critical). The omit-dev audit is 60 entries (18 high,
+   36 moderate, six low, zero critical). This candidate is uncommitted and not
+   pushed; the remote PR base remains stale. See
+   `docs/dependency-review-2026-11-02.md` for the dated Nov 2 inventory, Nov 9
+   revalidation, applicability groups, and vendor-request draft.
    The owner decided on 2026-11-02 to keep LIBDEV-3281 open pending vendor
    guidance, with no risk exception. Vendor submission/response and authenticated
    regression for the new dependencies remain pending. Do not
