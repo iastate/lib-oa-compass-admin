@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { CloudAppConfigService } from '@exlibris/exl-cloudapp-angular-lib';
 import { take } from 'rxjs/operators';
@@ -34,6 +34,8 @@ export interface OACompassConfig {
   styleUrls: ['./config.component.scss', './config.component.theme.scss'],
 })
 export class ConfigComponent implements OnInit {
+  @Input() embedded = false;
+  @Output() closed = new EventEmitter<void>();
 
   config: OACompassConfig = {
     proxyBaseUrl: '',
@@ -117,7 +119,9 @@ export class ConfigComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['']);
+    if (this.saving) return;
+    if (this.embedded) this.closed.emit();
+    else this.router.navigate(['']);
   }
 
   onSave(): void {
@@ -138,7 +142,8 @@ export class ConfigComponent implements OnInit {
         this.saving = false;
         this.saved = true;
         this.config = toSave;
-        this.router.navigate(['']);
+        if (this.embedded) this.closed.emit();
+        else this.router.navigate(['']);
       },
       error: (e) => {
         this.saving = false;

@@ -17,6 +17,11 @@
   align-items: center;
 }
 
+.config-title-row h1 {
+  margin: 0;
+  font: inherit;
+}
+
 .config-title-spacer {
   flex: 1 1 auto;
 }

@@ -36,9 +36,15 @@ npm run build
 npm run check
 ```
 
-The complete check builds the Cloud App, compares both manifests, lints the
+The complete check builds the Cloud App, runs component behavior tests,
+compares both manifests, lints the
 OpenAPI document, verifies canonical documentation, and enforces the public
 repository boundary.
+
+The `2.0.5` candidate adds accessible Settings/Configuration entry points and
+panel completion/focus behavior, semantic headings, keyboard selection, and
+status/error announcements. Hosted operator and accessibility acceptance
+remain release gates; this candidate is not a claim of vendor publication.
 
 ## Operator workflow
 

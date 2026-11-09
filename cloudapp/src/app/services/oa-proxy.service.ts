@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
+import { localDevelopmentProxy } from './local-development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
@@ -26,6 +27,8 @@ import {
   providedIn: 'root'
 })
 export class OAProxyService {
+
+  readonly localProxyUrl = localDevelopmentProxy(isDevMode(), typeof window === 'undefined' ? undefined : window.location);
 
   /**
    * Default proxy base URL.
@@ -93,14 +96,15 @@ export class OAProxyService {
     private configService: CloudAppConfigService,
     private events: CloudAppEventsService,
   ) {
+    if (this.localProxyUrl) this.baseUrl = this.localProxyUrl;
     // Load proxyBaseUrl + behavior flags from Cloud App config.
     this.configService.get().subscribe({
       next: (cfg: any) => {
         // Proxy URL
         const url = (cfg?.proxyBaseUrl || '').toString().trim();
-        if (url && url.startsWith('https://')) {
+        if (!this.localProxyUrl && url && url.startsWith('https://')) {
           this.baseUrl = url;
-        } else if (url) {
+        } else if (!this.localProxyUrl && url) {
           console.warn('OAProxyService: Ignoring non-HTTPS proxyBaseUrl from config.');
         }
 

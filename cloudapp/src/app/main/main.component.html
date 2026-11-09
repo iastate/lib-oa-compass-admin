@@ -1,5 +1,11 @@
 <!-- src/app/components/main/main.component.html -->
 <div class="oa-main-wrap">
+  <p *ngIf="localProxyUrl" role="status">
+    {{ 'oa.header.localProxy' | translate }} {{ localProxyUrl }}
+  </p>
+  <h1 *ngIf="!showSettings && !showConfig" class="oa-page-title">
+    {{ 'oa.header.title' | translate }}
+  </h1>
 
   <!-- ACTION BAR (above header, only in main view) -->
   <ng-container *ngIf="isAuthorized && !authorizationLoading && !showSettings && !showConfig">
@@ -52,6 +58,8 @@
   <!-- HEADER -------------------------------------------------------------- -->
   <oa-app-header
     [settingsOpen]="showSettings"
+    [configOpen]="showConfig"
+    [authorized]="isAuthorized && !authorizationLoading"
     [useEntityContext]="useEntityContext"
     [entityContextUserId]="entityContextUserId"
     [statusText]="actionStatus || ('oa.header.statusUserNotLoaded' | translate)"
@@ -61,15 +69,17 @@
   </oa-app-header>
 
   <!-- SETTINGS VIEW ------------------------------------------------------- -->
-  <section *ngIf="isAuthorized && showSettings" class="oa-section oa-section--settings">
+  <section *ngIf="isAuthorized && showSettings" id="oa-settings-panel" aria-labelledby="oa-settings-toggle" class="oa-section oa-section--settings">
     <oa-settings
+      [embedded]="true"
+      (closed)="closeSettings()"
       (settingsChanged)="onSettingsChanged($event)">
     </oa-settings>
   </section>
 
   <!-- CONFIG VIEW --------------------------------------------------------- -->
-  <section *ngIf="isAuthorized && showConfig" class="oa-section oa-section--settings">
-    <oa-config></oa-config>
+  <section *ngIf="isAuthorized && showConfig" id="oa-config-panel" aria-labelledby="oa-config-toggle" class="oa-section oa-section--settings">
+    <oa-config [embedded]="true" (closed)="closeConfig()"></oa-config>
   </section>
 
   <!-- MAIN CONTENT -------------------------------------------------------- -->
@@ -77,17 +87,30 @@
     *ngIf="!showSettings && !showConfig"
     class="oa-section oa-section--content">
 
-    <div *ngIf="authorizationLoading" class="oa-alert oa-alert--info">
+    <div
+      *ngIf="authorizationLoading"
+      class="oa-alert oa-alert--info"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true">
       <strong>{{ 'oa.auth.checking' | translate }}</strong>
     </div>
 
-    <div *ngIf="!authorizationLoading && !isAuthorized && !authorizationError" class="oa-alert oa-alert--error">
+    <div
+      *ngIf="!authorizationLoading && !isAuthorized && !authorizationError"
+      class="oa-alert oa-alert--error"
+      role="alert"
+      aria-atomic="true">
       <strong>{{ 'oa.auth.deniedTitle' | translate }}</strong>
       <p>{{ 'oa.auth.deniedMessage' | translate }}</p>
       <p>{{ 'oa.auth.requiredRoles' | translate:{ roles: requiredOperatorRoles } }}</p>
     </div>
 
-    <div *ngIf="!authorizationLoading && !isAuthorized && authorizationError" class="oa-alert oa-alert--error">
+    <div
+      *ngIf="!authorizationLoading && !isAuthorized && authorizationError"
+      class="oa-alert oa-alert--error"
+      role="alert"
+      aria-atomic="true">
       <strong>{{ 'oa.auth.errorTitle' | translate }}</strong>
       <p>{{ 'oa.auth.errorMessage' | translate }}</p>
       <p>{{ authorizationError }}</p>
@@ -118,10 +141,11 @@
         <mat-progress-bar
           *ngIf="loadingUser"
           mode="indeterminate"
+          [attr.aria-label]="'oa.status.loadingUser' | translate"
           class="oa-spinner">
         </mat-progress-bar>
 
-        <div *ngIf="error" class="oa-alert oa-alert--error">
+        <div *ngIf="error" class="oa-alert oa-alert--error" role="alert" aria-atomic="true">
           {{ error }}
         </div>
 
@@ -150,7 +174,12 @@
   </section>
 
   <!-- GLOBAL LOADING OVERLAY (covers entire app content area) -->
-  <div class="oa-global-loading" *ngIf="searching">
+  <div
+    class="oa-global-loading"
+    *ngIf="searching"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true">
     <div class="oa-global-loading__backdrop"></div>
 
     <div class="oa-global-loading__content">

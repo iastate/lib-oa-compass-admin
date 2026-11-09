@@ -78,6 +78,12 @@ Institution-level configuration defines the HTTPS proxy base URL, identifier
 type, optional excluded email domain, and username storage fields. Invalid
 non-HTTPS proxy values are ignored.
 
+Authorized operators can reach Settings and Configuration from named controls
+in the main view. Panels expose expanded state and semantic headings, preserve
+the selected-user context, and return keyboard focus when closed. Loading,
+success, authorization, and error states must be available to assistive
+technology; repository checks do not replace hosted accessibility acceptance.
+
 ## Quality and security outcomes
 
 - The production Angular build must succeed from the lockfile on Node.js 22.
